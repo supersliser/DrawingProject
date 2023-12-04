@@ -3,27 +3,7 @@
 #include "area.h"
 #include <SDL2/SDL.h>
 #include <stdio.h>
-
-class Button : public Area
-{
-    using Area::Area;
-
-public:
-    void Click();
-};
-
-class ColourButton : public Button
-{
-    using Button::Button;
-
-public:
-    void Click(colour *CurrentColour)
-    {
-        *CurrentColour = BackColour;
-    }
-};
-
-
+#include "button.h"
 
 int main()
 {

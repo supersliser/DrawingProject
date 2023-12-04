@@ -1,3 +1,3 @@
 program:
-	clang++ thing.cpp location.cpp colour.cpp area.cpp -lSDL2
+	clang++ thing.cpp location.cpp colour.cpp area.cpp button.cpp -lSDL2
 	./a.out
