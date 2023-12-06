@@ -182,3 +182,24 @@ void ResizableArea::Draw(SDL_Renderer* renderer, SDL_Window* window)
 	}
 	Area::Draw(renderer);
 }
+
+Canvas::Canvas(Area* inParent)
+{
+	Position = location((*inParent).getPosition().x + 20, (*inParent).getPosition().y + 20);
+	Size = size((*inParent).getSize().width - 40, (*inParent).getSize().height - 40);
+	BackColour = colour(white);
+	BorderColour = colour(white);
+}
+
+Canvas::Canvas(ResizableArea* inParent)
+{
+	Position = location((*inParent).getPosition().x + 20, (*inParent).getPosition().y + 20);
+	Size = size((*inParent).getSize().width - 40, (*inParent).getSize().height - 40);
+	BackColour = colour(white);
+	BorderColour = colour(white);
+}
+
+colour Canvas::getCurrentColour()
+{
+	return CurrentColour;
+}

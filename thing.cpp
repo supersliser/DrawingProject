@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include "button.h"
+#include "window.h"
 
 int main()
 {
@@ -11,39 +12,12 @@ int main()
     {
         printf("error: %s \n", SDL_GetError());
     }
-    int windowWidth = 1200;
-    int windowHeight = 600;
-    SDL_Window *window = SDL_CreateWindow("testwindow1", 100, 100, windowWidth, windowHeight, SDL_WINDOW_RESIZABLE);
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
-    SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
-    SDL_RenderClear(renderer);
-    int finished = 0;
-    colour CurrentColour = colour(black);
-    ColourButton Colours[10];
+    CanvasWindow* mainWindow = new CanvasWindow("Drawence Dellalio");
 
-    ResizableArea colourArea = *new ResizableArea(location(0), size(windowWidth, 120), colour(60), colour(255), 4, SizeLock::height, window);
-    ResizableArea CanvasArea = *new ResizableArea(location(0, 160), size(windowWidth, windowHeight - (colourArea.getSize().height * 2)), colour(128), colour(255), 0, SizeLock::width, window);
-    Area canvas = *new Area(location(40, 0), size(CanvasArea.getSize().width - 80, CanvasArea.getSize().height), colour(255), colour(255));
-    CanvasArea.addChild(&canvas);
+    (*mainWindow).Draw();
 
-    const int ButtonSize = 25;
-    for (int i = 0; i < 8; i++)
-    {
-        Colours[i] = *new ColourButton(*(new location(colourArea.getPosition().x + 80 + ((int)(i / 2) * ButtonSize), colourArea.getPosition().y + 20 + (ButtonSize * (i % 2)))), size(ButtonSize), colour((defaultColours)i), colour(255));
-    }
-
-    SDL_Rect brush;
-    brush.w = 5;
-    brush.h = 5;
-
-    colourArea.Draw(renderer, window);
-    CanvasArea.Draw(renderer, window);
-    for (int i = 0; i < 8; i++)
-    {
-        Colours[i].Draw(renderer);
-    }
-    char drawing = 0;
-
+    bool drawing = 0;
+    bool finished = 0;
     while (!finished)
     {
         SDL_Event event; /* an incoming event */

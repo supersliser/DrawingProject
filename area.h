@@ -46,3 +46,14 @@ protected:
 	SizeLock lock = SizeLock::none;
 	margin Margin;
 };
+
+class Canvas : public Area
+{
+    using Area::Area;
+protected:
+    colour CurrentColour;
+public:
+    Canvas(Area* inParent);
+    Canvas(ResizableArea* inParent);
+    colour getCurrentColour();
+};
