@@ -113,13 +113,13 @@ void CanvasWindow::Activate()
                 drawing = 1;
                 for (int i = 0; i < 8; i++)
                 {
-                    if (event.button.x >= Colours[i].getPosition().x &&
-                        event.button.x <= Colours[i].getPosition().x + Colours[i].getSize().width &&
-                        event.button.y >= Colours[i].getPosition().y &&
-                        event.button.y <= Colours[i].getPosition().y + Colours[i].getSize().height)
+                    if (event.button.x >= ColourButtons[i].getPosition().x &&
+                        event.button.x <= ColourButtons[i].getPosition().x + ColourButtons[i].getSize().width &&
+                        event.button.y >= ColourButtons[i].getPosition().y &&
+                        event.button.y <= ColourButtons[i].getPosition().y + ColourButtons[i].getSize().height)
                     {
-                        Colours[i].Click(&CurrentColour);
-                        printf("current colour is %d, %d, %d, %d", CurrentColour.r, CurrentColour.g, CurrentColour.b, CurrentColour.a);
+                        ColourButtons[i].Click(&(*CanvasItem).getCurrentColour());
+                        printf("current colour is %d, %d, %d, %d", (*CanvasItem).getCurrentColour().r, (*CanvasItem).getCurrentColour().g, (*CanvasItem).getCurrentColour().b, (*CanvasItem).getCurrentColour().a);
                         fflush(stdout);
                     }
                 }
@@ -128,5 +128,12 @@ void CanvasWindow::Activate()
                 drawing = 0;
                 break;
             }
+        }
     }
+}
+
+CanvasWindow::~CanvasWindow()
+{
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
 }

@@ -38,6 +38,7 @@ protected:
     Canvas* CanvasItem;
 public:
     CanvasWindow(char* WindowName);
+    ~CanvasWindow();
     void Activate();
     void Draw();
 };
