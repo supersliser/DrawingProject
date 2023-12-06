@@ -5,21 +5,34 @@ Window::Window()
 {
     window = SDL_CreateWindow("Blank Window Name", 50, 50, 400, 500, SDL_WINDOW_RESIZABLE);
     renderer = SDL_CreateRenderer(window, -1, 0);
+    SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
+    SDL_RenderClear(renderer);
 }
 Window::Window(char *WindowName)
 {
     window = SDL_CreateWindow(WindowName, 50, 50, 400, 500, SDL_WINDOW_RESIZABLE);
     renderer = SDL_CreateRenderer(window, -1, 0);
+    SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
+    SDL_RenderClear(renderer);
 }
 Window::Window(char *WindowName, location Position, size Size)
 {
     window = SDL_CreateWindow(WindowName, Position.x, Position.y, Size.width, Size.height, SDL_WINDOW_RESIZABLE);
     renderer = SDL_CreateRenderer(window, -1, 0);
+    SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
+    SDL_RenderClear(renderer);
 }
 Window::Window(char *WindowName, size Size)
 {
     window = SDL_CreateWindow(WindowName, 50, 50, Size.width, Size.height, SDL_WINDOW_RESIZABLE);
     renderer = SDL_CreateRenderer(window, -1, 0);
+    SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
+    SDL_RenderClear(renderer);
+}
+Window::~Window()
+{
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
 }
 SDL_Window *Window::getWindow()
 {
@@ -37,6 +50,8 @@ void Window::Activate()
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
+            SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
+            SDL_RenderClear(renderer);
             switch (event.type)
             {
             case SDL_QUIT:
@@ -47,17 +62,17 @@ void Window::Activate()
     }
 }
 
-StarterWindow::StarterWindow(char* WindowName)
+StarterWindow::StarterWindow(char *WindowName)
 {
-    window = SDL_CreateWindow(WindowName, 500, 600, 200, 200, SDL_WINDOW_BORDERLESS && SDL_WINDOW_INPUT_GRABBED);
+    window = SDL_CreateWindow(WindowName, 500, 600, 200, 200, SDL_WINDOW_BORDERLESS);
     renderer = SDL_CreateRenderer(window, -1, 0);
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderClear(renderer);
 }
 
-CanvasWindow::CanvasWindow(char* WindowName)
+CanvasWindow::CanvasWindow(char *WindowName)
 {
-    window = SDL_CreateWindow(WindowName, 20, 20, 800, 600, SDL_WINDOW_RESIZABLE);
+    window = SDL_CreateWindow(WindowName, 20, 20, 1200, 800, SDL_WINDOW_RESIZABLE);
     renderer = SDL_CreateRenderer(window, -1, 0);
     SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
     SDL_RenderClear(renderer);
@@ -89,13 +104,16 @@ void CanvasWindow::Activate()
     brush.h = 5;
     bool finished = 0;
     bool drawing = 0;
+    Draw();
     while (!finished)
     {
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
+            Draw();
             if (drawing)
             {
+                Draw();
                 if (event.button.y >= (*CanvasItem).getPosition().y && event.button.y <= (*CanvasItem).getPosition().y + (*CanvasItem).getSize().height && event.button.x >= (*CanvasItem).getPosition().x && event.button.x <= (*CanvasItem).getPosition().x + (*CanvasItem).getSize().width)
                 {
                     SDL_SetRenderDrawColor(renderer, (*CanvasItem).getCurrentColour().r, (*CanvasItem).getCurrentColour().g, (*CanvasItem).getCurrentColour().b, (*CanvasItem).getCurrentColour().a);
@@ -108,6 +126,8 @@ void CanvasWindow::Activate()
             {
             case SDL_QUIT:
                 finished = 1;
+                Window::~Window();
+                printf("window quitted");
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 drawing = 1;
@@ -118,7 +138,7 @@ void CanvasWindow::Activate()
                         event.button.y >= ColourButtons[i].getPosition().y &&
                         event.button.y <= ColourButtons[i].getPosition().y + ColourButtons[i].getSize().height)
                     {
-                        ColourButtons[i].Click(&(*CanvasItem).getCurrentColour());
+                        ColourButtons[i].Click((*CanvasItem).getCurrentColour());
                         printf("current colour is %d, %d, %d, %d", (*CanvasItem).getCurrentColour().r, (*CanvasItem).getCurrentColour().g, (*CanvasItem).getCurrentColour().b, (*CanvasItem).getCurrentColour().a);
                         fflush(stdout);
                     }
@@ -130,10 +150,4 @@ void CanvasWindow::Activate()
             }
         }
     }
-}
-
-CanvasWindow::~CanvasWindow()
-{
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
 }

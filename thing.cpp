@@ -12,14 +12,10 @@ int main()
     {
         printf("error: %s \n", SDL_GetError());
     }
-    CanvasWindow* mainWindow = new CanvasWindow("Drawence Dellalio");
-
-    (*mainWindow).Draw();
-
-    bool drawing = 0;
-    bool finished = 0;
+    Window* mainWindow = new Window("Drawence Dellalio");
 
     (*mainWindow).Activate();
+
     delete mainWindow;
     SDL_Quit();
     return 0;

@@ -1,3 +1,4 @@
+#pragma once
 #include "area.h"
 #include "colour.h"
 
@@ -12,5 +13,5 @@ class ColourButton : public Button
 {
     using Button::Button;
 public:
-    void Click(colour *CurrentColour);
+    void Click(colour CurrentColour);
 };

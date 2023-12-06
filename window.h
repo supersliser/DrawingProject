@@ -1,3 +1,4 @@
+#pragma once
 #include <SDL2/SDL.h>
 #include "location.h"
 #include "colour.h"
@@ -11,6 +12,7 @@ protected:
 
 public:
     Window();
+    ~Window();
     Window(char *WindowName);
     Window(char *WindowName, location Position, size Size);
     Window(char *WindowName, size Size);
@@ -19,18 +21,14 @@ public:
     void Activate();
 };
 
-class StarterWindow : public Window
+class StarterWindow : Window
 {
-    using Window::Window;
-
 public:
     StarterWindow(char* WindowName);
 };
 
-class CanvasWindow : public Window
+class CanvasWindow : Window
 {
-    using Window::Window;
-
 protected:
     ColourButton ColourButtons[8];
     ResizableArea* ColourArea;
@@ -38,7 +36,6 @@ protected:
     Canvas* CanvasItem;
 public:
     CanvasWindow(char* WindowName);
-    ~CanvasWindow();
     void Activate();
     void Draw();
 };
