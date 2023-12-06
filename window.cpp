@@ -33,6 +33,7 @@ Window::~Window()
 {
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    printf("window exited\n");
 }
 SDL_Window *Window::getWindow()
 {
@@ -45,17 +46,20 @@ SDL_Renderer *Window::getRenderer()
 void Window::Activate()
 {
     bool finished = 0;
+    int i = 0;
     while (!finished)
     {
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
-            SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
+            printf("event %d triggered in window at location %d\n", i++, this);
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
             SDL_RenderClear(renderer);
             switch (event.type)
             {
             case SDL_QUIT:
                 finished = 1;
+                Window::~Window();
                 break;
             }
         }
@@ -110,6 +114,7 @@ void CanvasWindow::Activate()
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
+            printf("event triggered in window at location %d\n", this);
             Draw();
             if (drawing)
             {
@@ -127,7 +132,7 @@ void CanvasWindow::Activate()
             case SDL_QUIT:
                 finished = 1;
                 Window::~Window();
-                printf("window quitted");
+                printf("window quitted\n");
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 drawing = 1;
