@@ -1,18 +1,16 @@
 #include "window.h"
 #include "area.h"
 
+
 Window::Window()
 {
-    window = SDL_CreateWindow("Blank Window Name", 50, 50, 800, 800, SDL_WINDOW_RESIZABLE);
-    renderer = SDL_CreateRenderer(window, -1, 0);
-    SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
-    SDL_RenderClear(renderer);
+
 }
 Window::Window(char *WindowName)
 {
     window = SDL_CreateWindow(WindowName, 50, 50, 800, 800, SDL_WINDOW_RESIZABLE);
     renderer = SDL_CreateRenderer(window, -1, 0);
-    SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderClear(renderer);
 }
 Window::Window(char *WindowName, location Position, size Size)
@@ -47,14 +45,16 @@ void Window::Activate()
 {
     bool finished = 0;
     int i = 0;
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderClear(renderer);
     while (!finished)
     {
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderClear(renderer);
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
             printf("event %d triggered in window at location %d\n", i++, this);
-            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-            SDL_RenderClear(renderer);
             switch (event.type)
             {
             case SDL_QUIT:
@@ -78,8 +78,6 @@ CanvasWindow::CanvasWindow(char *WindowName, int ButtonSize)
 {
     window = SDL_CreateWindow(WindowName, 20, 20, 1200, 800, SDL_WINDOW_RESIZABLE);
     renderer = SDL_CreateRenderer(window, -1, 0);
-    SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
-    SDL_RenderClear(renderer);
     ColourArea = new ResizableArea(location(0), size(800, 120), colour(60), colour(255), 4, SizeLock::height, window);
     CanvasArea = new ResizableArea(location(0, 160), size(800, 600 - ((*ColourArea).getSize().height * 2)), colour(128), colour(255), 0, SizeLock::width, window);
     CanvasItem = new Canvas(CanvasArea);
@@ -87,7 +85,6 @@ CanvasWindow::CanvasWindow(char *WindowName, int ButtonSize)
     for (int i = 0; i < 8; i++)
     {
         ColourButtons[i] = *new ColourButton(*(new location((*ColourArea).getPosition().x + 80 + ((int)(i / 2) * ButtonSize), (*ColourArea).getPosition().y + 20 + (ButtonSize * (i % 2)))), size(ButtonSize), colour((defaultColours)i), colour(255));
-        (*ColourArea).addChild(ColourButtons + (i * sizeof(ColourButton)));
     }
 }
 
