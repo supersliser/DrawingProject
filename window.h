@@ -21,13 +21,13 @@ public:
     void Activate();
 };
 
-class StarterWindow : Window
+class StarterWindow : public Window
 {
 public:
     StarterWindow(char* WindowName);
 };
 
-class CanvasWindow : Window
+class CanvasWindow : public Window
 {
 protected:
     ColourButton ColourButtons[8];
@@ -35,7 +35,7 @@ protected:
     ResizableArea* CanvasArea;
     Canvas* CanvasItem;
 public:
-    CanvasWindow(char* WindowName);
+    CanvasWindow(char *WindowName, int ButtonSize);
     void Activate();
     void Draw();
 };

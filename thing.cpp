@@ -12,11 +12,12 @@ int main()
     {
         printf("error: %s \n", SDL_GetError());
     }
-    Window* mainWindow = new Window("Drawence Dellalio");
+    char windowname[18] = "Drawence Dellalio";
+    CanvasWindow mainWindow = *new CanvasWindow(windowname, 25);
 
-    (*mainWindow).Activate();
+    mainWindow.Activate();
 
-    delete mainWindow;
+
     SDL_Quit();
     return 0;
 }

@@ -54,6 +54,5 @@ protected:
     colour CurrentColour;
 public:
     Canvas(Area* inParent);
-    Canvas(ResizableArea* inParent);
     colour getCurrentColour();
 };
