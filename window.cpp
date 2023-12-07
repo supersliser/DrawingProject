@@ -100,6 +100,7 @@ void CanvasWindow::Draw()
 
 void CanvasWindow::Activate()
 {
+    int i = 0;
     SDL_Rect brush;
     brush.w = 5;
     brush.h = 5;
@@ -113,11 +114,10 @@ void CanvasWindow::Activate()
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
-            printf("event triggered in window at location %d\n", this);
+            printf("event %d triggered in window at location %d\n",i , this);
             Draw();
             if (drawing)
             {
-                Draw();
                 if (event.button.y >= (*CanvasItem).getPosition().y && event.button.y <= (*CanvasItem).getPosition().y + (*CanvasItem).getSize().height && event.button.x >= (*CanvasItem).getPosition().x && event.button.x <= (*CanvasItem).getPosition().x + (*CanvasItem).getSize().width)
                 {
                     SDL_SetRenderDrawColor(renderer, (*CanvasItem).getCurrentColour().r, (*CanvasItem).getCurrentColour().g, (*CanvasItem).getCurrentColour().b, (*CanvasItem).getCurrentColour().a);
