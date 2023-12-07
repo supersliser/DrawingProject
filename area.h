@@ -13,12 +13,11 @@ protected:
     Area** children = nullptr;
     int childCount = 0;
     Area* parent = nullptr;
-
 public:
     Area();
-    Area(location inPosition, size inSize);
-    Area(location inPosition, size inSize, colour inBC);
-    Area(location inPosition, size inSize, colour inBC, colour inBorderC);
+    Area(location inPosition, size inSize, SDL_Window* window);
+    Area(location inPosition, size inSize, colour inBC, SDL_Window* window);
+    Area(location inPosition, size inSize, colour inBC, colour inBorderC, SDL_Window* window);
     void setPosition(location in);
     void setSize(size in);
     void setBackColour(colour in);
@@ -31,18 +30,17 @@ public:
     size getSize();
     colour getBackColour();
     colour getBorderColour();
-    void Draw(SDL_Renderer** renderer);
+    void Draw(SDL_Renderer* renderer);
 };
 
 class ResizableArea : public Area
 {
 	using Area::Area;
-
 public:
-	ResizableArea(location inPosition, size inSize, colour inBC, colour inBorderC, int inBW, SizeLock inLock, SDL_Renderer* renderer);
-    ResizableArea(location inPosition, size inSize, colour inBC, colour inBorderC, int inBW, SizeLock inLock, Area* Parent, SDL_Renderer* renderer);
-    void Draw(SDL_Renderer** renderer, SDL_Window** window);
-
+	ResizableArea(location inPosition, size inSize, colour inBC, colour inBorderC, int inBW, SizeLock inLock, SDL_Window* window);
+    ResizableArea(location inPosition, size inSize, colour inBC, colour inBorderC, int inBW, SizeLock inLock, Area* Parent, SDL_Window* window);
+    void Draw(SDL_Renderer* renderer, SDL_Window* window);
+    SDL_Surface* drawing;
 protected:
 	SizeLock lock = SizeLock::none;
 	margin Margin;
@@ -55,5 +53,6 @@ protected:
     colour CurrentColour;
 public:
     Canvas(Area* inParent);
-    colour getCurrentColour();
+    colour* getCurrentColour();
+    void Draw(SDL_Renderer* renderer);
 };

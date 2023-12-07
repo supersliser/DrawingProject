@@ -7,8 +7,8 @@
 class Window
 {
 protected:
-    SDL_Window **window;
-    SDL_Renderer **renderer;
+    SDL_Window *window;
+    SDL_Renderer *renderer;
     void CreateWindow(char* Name, location Position, size Size, colour InitialColour, Uint32 Flags);
 public:
     Window();
@@ -16,8 +16,8 @@ public:
     Window(char *WindowName);
     Window(char *WindowName, location Position, size Size);
     Window(char *WindowName, size Size);
-    SDL_Window **getWindow();
-    SDL_Renderer **getRenderer();
+    SDL_Window *getWindow();
+    SDL_Renderer *getRenderer();
     void Activate();
 };
 

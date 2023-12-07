@@ -7,21 +7,21 @@ Area::Area()
 	BackColour = colour(white);
 	BorderColour = colour(255);
 }
-Area::Area(location inPosition, size inSize)
+Area::Area(location inPosition, size inSize, SDL_Window *window)
 {
 	Position = inPosition;
 	Size = inSize;
 	BackColour = colour(white);
 	BorderColour = colour(255);
 }
-Area::Area(location inPosition, size inSize, colour inBC)
+Area::Area(location inPosition, size inSize, colour inBC, SDL_Window *window)
 {
 	Position = inPosition;
 	Size = inSize;
 	BackColour = inBC;
 	BorderColour = colour(255);
 }
-Area::Area(location inPosition, size inSize, colour inBC, colour inBorderC)
+Area::Area(location inPosition, size inSize, colour inBC, colour inBorderC, SDL_Window *window)
 {
 	Position = inPosition;
 	Size = inSize;
@@ -48,18 +48,18 @@ void Area::setBorderColour(colour in)
 //    {
 //        borderWidth = in;
 //    }
-void Area::setParent(Area* inParent)
+void Area::setParent(Area *inParent)
 {
 	parent = inParent;
 }
-void Area::addChild(Area* inArea)
+void Area::addChild(Area *inArea)
 {
 	if (childCount == 0)
 	{
-		children = (Area**)malloc(sizeof(Area*));
+		children = (Area **)malloc(sizeof(Area *));
 	}
 	childCount++;
-	children = (Area**)realloc(children, sizeof(Area*) * childCount);
+	children = (Area **)realloc(children, sizeof(Area *) * childCount);
 	children[childCount - 1] = inArea;
 	(*inArea).setParent(this);
 }
@@ -71,9 +71,9 @@ void Area::killChild(int index)
 		children[i] = children[i + 1];
 	}
 	childCount--;
-	children = (Area**)realloc(children, sizeof(Area*) * childCount);
+	children = (Area **)realloc(children, sizeof(Area *) * childCount);
 }
-Area* Area::getChild(int index)
+Area *Area::getChild(int index)
 {
 	return children[index];
 }
@@ -87,8 +87,10 @@ location Area::getPosition()
 	}
 	else
 	{
-		temp.x = Position.x + (*parent).getPosition().x;;
-		temp.y = Position.y + (*parent).getPosition().y;;
+		temp.x = Position.x + (*parent).getPosition().x;
+		;
+		temp.y = Position.y + (*parent).getPosition().y;
+		;
 	}
 	return temp;
 }
@@ -108,7 +110,7 @@ colour Area::getBorderColour()
 //    {
 //        return borderWidth;
 //    }
-void Area::Draw(SDL_Renderer** renderer)
+void Area::Draw(SDL_Renderer *renderer)
 {
 	SDL_Rect temp;
 	if (parent == nullptr)
@@ -118,23 +120,23 @@ void Area::Draw(SDL_Renderer** renderer)
 	}
 	else
 	{
-		temp.x = Position.x + (*parent).getPosition().x;;
-		temp.y = Position.y + (*parent).getPosition().y;;
+		temp.x = Position.x + (*parent).getPosition().x;
+		;
+		temp.y = Position.y + (*parent).getPosition().y;
+		;
 	}
 	temp.w = Size.width;
 	temp.h = Size.height;
-	SDL_SetRenderDrawColor(*renderer, BackColour.r, BackColour.g, BackColour.b, BackColour.a);
-	SDL_RenderFillRect(*renderer, &temp);
-	SDL_SetRenderDrawColor(*renderer, BorderColour.r, BorderColour.g, BorderColour.b, BorderColour.a);
+	SDL_SetRenderDrawColor(renderer, BackColour.r, BackColour.g, BackColour.b, BackColour.a);
+	SDL_RenderFillRect(renderer, &temp);
+	SDL_SetRenderDrawColor(renderer, BorderColour.r, BorderColour.g, BorderColour.b, BorderColour.a);
 	for (int i = 0; i < childCount; i++)
 	{
 		(*children[i]).Draw(renderer);
 	}
 }
 
-
-
-ResizableArea::ResizableArea(location inPosition, size inSize, colour inBC, colour inBorderC, int inBW, SizeLock inLock, SDL_Renderer* renderer)
+ResizableArea::ResizableArea(location inPosition, size inSize, colour inBC, colour inBorderC, int inBW, SizeLock inLock, SDL_Window *window)
 {
 	if (parent == nullptr)
 	{
@@ -150,8 +152,8 @@ ResizableArea::ResizableArea(location inPosition, size inSize, colour inBC, colo
 	BorderColour = inBorderC;
 	lock = inLock;
 	log("properties assigned");
-	size Temp = size(0,0);
-	SDL_GetRendererOutputSize(renderer, &Temp.width, &Temp.height);
+	size Temp = size(0, 0);
+	SDL_GetWindowSize(window, &Temp.width, &Temp.height);
 	printf("window size is x= %d, y= %d\n", Temp.width, Temp.height);
 	fflush(stdout);
 	Margin.top = Position.y;
@@ -160,7 +162,7 @@ ResizableArea::ResizableArea(location inPosition, size inSize, colour inBC, colo
 	Margin.right = Temp.width - (Margin.left + Size.width);
 	log("margin assigned");
 }
-ResizableArea::ResizableArea(location inPosition, size inSize, colour inBC, colour inBorderC, int inBW, SizeLock inLock, Area* Parent, SDL_Renderer* renderer)
+ResizableArea::ResizableArea(location inPosition, size inSize, colour inBC, colour inBorderC, int inBW, SizeLock inLock, Area *Parent, SDL_Window *window)
 {
 	parent = Parent;
 	if (parent == nullptr)
@@ -178,8 +180,8 @@ ResizableArea::ResizableArea(location inPosition, size inSize, colour inBC, colo
 	lock = inLock;
 
 	log("properties assigned");
-	size Temp = size(0,0);
-	SDL_GetRendererOutputSize(renderer, &Temp.width, &Temp.height);
+	size Temp = size(0, 0);
+	SDL_GetWindowSize(window, &Temp.width, &Temp.height);
 	printf("window size is x= %d, y= %d\n", Temp.width, Temp.height);
 	fflush(stdout);
 	Margin.top = Position.y;
@@ -187,12 +189,12 @@ ResizableArea::ResizableArea(location inPosition, size inSize, colour inBC, colo
 	Margin.bottom = Temp.height - (Margin.top + Size.height);
 	Margin.right = Temp.width - (Margin.left + Size.width);
 }
-void ResizableArea::Draw(SDL_Renderer** renderer, SDL_Window** window)
+void ResizableArea::Draw(SDL_Renderer *renderer, SDL_Window *window)
 {
 	size temp;
 	if (parent == nullptr)
 	{
-		SDL_GetWindowSize(*window, &(temp.width), &(temp.height));
+		SDL_GetWindowSize(window, &(temp.width), &(temp.height));
 	}
 	else
 	{
@@ -214,16 +216,19 @@ void ResizableArea::Draw(SDL_Renderer** renderer, SDL_Window** window)
 	Area::Draw(renderer);
 }
 
-Canvas::Canvas(Area* inParent)
+Canvas::Canvas(Area *inParent)
 {
-	parent = inParent;
-	Position = location((*parent).getPosition().x + 20, (*parent).getPosition().y + 20);
-	Size = size((*parent).getSize().width - 40, (*parent).getSize().height - 40);
+	Position = location((*inParent).getPosition().x + 20, (*inParent).getPosition().y + 20);
+	Size = size((*inParent).getSize().width - 40, (*inParent).getSize().height - 40);
 	BackColour = colour(white);
 	BorderColour = colour(white);
 }
 
-colour Canvas::getCurrentColour()
+colour* Canvas::getCurrentColour()
 {
-	return CurrentColour;
+	return &CurrentColour;
+}
+
+void Canvas::Draw(SDL_Renderer *renderer)
+{
 }

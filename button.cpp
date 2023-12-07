@@ -4,7 +4,7 @@
 void Button::Click()
 {
 }
-void ColourButton::Click(colour CurrentColour)
+void ColourButton::Click(colour* CurrentColour)
 {
-    CurrentColour = BackColour;
+    *CurrentColour = BackColour;
 }
