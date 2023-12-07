@@ -31,7 +31,7 @@ public:
     size getSize();
     colour getBackColour();
     colour getBorderColour();
-    void Draw(SDL_Renderer* renderer);
+    void Draw(SDL_Renderer** renderer);
 };
 
 class ResizableArea : public Area
@@ -39,8 +39,9 @@ class ResizableArea : public Area
 	using Area::Area;
 
 public:
-	ResizableArea(location inPosition, size inSize, colour inBC, colour inBorderC, int inBW, SizeLock inLock, SDL_Window* window);
-    void Draw(SDL_Renderer* renderer, SDL_Window* window);
+	ResizableArea(location inPosition, size inSize, colour inBC, colour inBorderC, int inBW, SizeLock inLock, SDL_Renderer* renderer);
+    ResizableArea(location inPosition, size inSize, colour inBC, colour inBorderC, int inBW, SizeLock inLock, Area* Parent, SDL_Renderer* renderer);
+    void Draw(SDL_Renderer** renderer, SDL_Window** window);
 
 protected:
 	SizeLock lock = SizeLock::none;
