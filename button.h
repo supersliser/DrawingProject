@@ -5,6 +5,7 @@
 class Button : public Area
 {
     using Area::Area;
+
 public:
     void Click();
 };
@@ -12,6 +13,7 @@ public:
 class ColourButton : public Button
 {
     using Button::Button;
+
 public:
-    void Click(colour* CurrentColour);
+    void Click(colour *CurrentColour);
 };

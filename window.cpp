@@ -119,19 +119,19 @@ void CanvasWindow::Activate()
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
-            if (drawing)
-            {
-                if (event.button.y >= (*CanvasItem).getPosition().y && event.button.y <= (*CanvasItem).getPosition().y + (*CanvasItem).getSize().height && event.button.x >= (*CanvasItem).getPosition().x && event.button.x <= (*CanvasItem).getPosition().x + (*CanvasItem).getSize().width)
-                {
-                    SDL_SetRenderDrawColor(renderer, (*CanvasItem).getCurrentColour()->r, (*CanvasItem).getCurrentColour()->g, (*CanvasItem).getCurrentColour()->b, (*CanvasItem).getCurrentColour()->a);
-                    brush.x = event.button.x - 2;
-                    brush.y = event.button.y - 2;
-                    SDL_RenderFillRect(renderer, &brush);
-                    SDL_RenderPresent(renderer);
-                }
-            }
             switch (event.type)
             {
+            case SDL_KEYDOWN:
+                switch (event.key.keysym.sym)
+                {
+                case SDLK_f:
+                    CanvasItem->BrushMode = Fill;
+                    break;
+                case SDLK_b:
+                    CanvasItem->BrushMode = Basic;
+                    break;
+                }
+                break;
             case SDL_QUIT:
                 finished = 1;
                 Window::~Window();
@@ -154,9 +154,26 @@ void CanvasWindow::Activate()
                         }
                     }
                 }
+                if (CanvasItem->BrushMode == Fill)
+                {
+                    CanvasItem->Fill(renderer, window, *(CanvasItem->getCurrentColour()), location(event.button.x, event.button.y), CanvasItem->getSize());
+                }
                 break;
             case SDL_MOUSEBUTTONUP:
                 drawing = 0;
+                break;
+            case SDL_MOUSEMOTION:
+                if (drawing && CanvasItem->BrushMode == Basic)
+                {
+                    if (event.button.y >= (*CanvasItem).getPosition().y && event.button.y <= (*CanvasItem).getPosition().y + (*CanvasItem).getSize().height && event.button.x >= (*CanvasItem).getPosition().x && event.button.x <= (*CanvasItem).getPosition().x + (*CanvasItem).getSize().width)
+                    {
+                        SDL_SetRenderDrawColor(renderer, (*CanvasItem).getCurrentColour()->r, (*CanvasItem).getCurrentColour()->g, (*CanvasItem).getCurrentColour()->b, (*CanvasItem).getCurrentColour()->a);
+                        brush.x = event.button.x - 2;
+                        brush.y = event.button.y - 2;
+                        SDL_RenderDrawLine(renderer, event.button.x - event.motion.xrel, event.button.y - event.motion.yrel, event.button.x, event.button.y);
+                        SDL_RenderPresent(renderer);
+                    }
+                }
                 break;
             }
         }

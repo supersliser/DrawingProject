@@ -224,11 +224,66 @@ Canvas::Canvas(Area *inParent)
 	BorderColour = colour(white);
 }
 
-colour* Canvas::getCurrentColour()
+colour *Canvas::getCurrentColour()
 {
 	return &CurrentColour;
 }
 
 void Canvas::Draw(SDL_Renderer *renderer)
 {
+}
+
+void Canvas::Fill(SDL_Renderer *renderer, SDL_Window *window, colour inColour, location mouseLocation, size CanvasSize)
+{
+	colour plane[CanvasSize.width * CanvasSize.height];
+	SDL_Surface *s = SDL_GetWindowSurface(window);
+	SDL_ConvertSurfaceFormat(s, SDL_PIXELFORMAT_RGB24, 0);
+	int y = 0;
+	for (int x = 0; x < sizeof(s); x += 3)
+	{
+		if (x / 3 == (*s).w)
+		{
+			y++;
+		}
+		colour pcol;
+		Uint32 pixel;
+		SDL_Rect rect; /* SDL rectangle of 1 pixel */
+		/* 2 helper structures to get SDL to generate the right pixel format */
+		SDL_Surface *s = SDL_CreateRGBSurface(0, 5, 5, 32, 0, 0, 0, 0);				/* helper 1 */
+		SDL_Surface *ns = SDL_ConvertSurfaceFormat(s, SDL_PIXELFORMAT_ARGB8888, 0); /* 2 */
+		rect.x = x;
+		rect.y = y;
+		rect.w = 1;
+		rect.h = 1;
+		/* renderer, pixel, target format, target array, safety value 5 (1 was needed) */
+		if (!SDL_RenderReadPixels(renderer, &rect, SDL_PIXELFORMAT_ARGB8888, &pixel, 5))
+		{ /* pixel, pixel format (from helper 2), colour channels by reference */
+			SDL_GetRGB(pixel, ns->format, &(pcol.r), &(pcol.g), &(pcol.b));
+		}
+		SDL_FreeSurface(s);	 /* free helper 1 */
+		SDL_FreeSurface(ns); /* free helper 2 */
+		plane[x + (y * CanvasSize.width)] = pcol;
+	}
+	Fillr(renderer, &inColour, mouseLocation, plane, &CanvasSize);
+}
+
+void Canvas::Fillr(SDL_Renderer *renderer, colour *inColour, location PointLocation, colour *plane, size *CanvasSize)
+{
+	SDL_RenderDrawPoint(renderer, PointLocation.x, PointLocation.y);
+	if (PointLocation.x - 1 < 0 || plane[PointLocation.x - 1 + (PointLocation.y * (*CanvasSize).width)].r != 255)
+	{
+		Fillr(renderer, inColour, location(PointLocation.x - 1, PointLocation.y), plane, CanvasSize);
+	}
+	if (PointLocation.y - 1 < 0 || plane[PointLocation.x - 1 + (PointLocation.y * (*CanvasSize).width)].r != 255)
+	{
+		Fillr(renderer, inColour, location(PointLocation.x, PointLocation.y - 1), plane, CanvasSize);
+	}
+	if (PointLocation.x + 1 < 0 || plane[PointLocation.x - 1 + (PointLocation.y * (*CanvasSize).width)].r != 255)
+	{
+		Fillr(renderer, inColour, location(PointLocation.x + 1, PointLocation.y), plane, CanvasSize);
+	}
+	if (PointLocation.y + 1 < 0 || plane[PointLocation.x - 1 + (PointLocation.y * (*CanvasSize).width)].r != 255)
+	{
+		Fillr(renderer, inColour, location(PointLocation.x, PointLocation.y + 1), plane, CanvasSize);
+	}
 }
