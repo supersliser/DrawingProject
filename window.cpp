@@ -1,6 +1,7 @@
 #include "window.h"
 #include "area.h"
 #include "log.h"
+#include <SDL2/SDL.h>
 
 Window::Window()
 {
@@ -93,6 +94,8 @@ CanvasWindow::CanvasWindow(char *WindowName, int ButtonSize)
 
 void CanvasWindow::Draw()
 {
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_RenderClear(renderer);
     (*ColourArea).Draw(renderer, window);
     (*CanvasArea).Draw(renderer, window);
     for (int i = 0; i < 8; i++)
@@ -156,7 +159,7 @@ void CanvasWindow::Activate()
                 }
                 if (CanvasItem->BrushMode == Fill)
                 {
-                    CanvasItem->Fill(renderer, window, *(CanvasItem->getCurrentColour()), location(event.button.x, event.button.y), CanvasItem->getSize());
+                    CanvasItem->Fill(renderer, window, *(CanvasItem->getCurrentColour()), location(event.button.x, event.button.y), CanvasItem->getSize(), CanvasItem->getPosition());
                 }
                 break;
             case SDL_MOUSEBUTTONUP:

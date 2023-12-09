@@ -22,9 +22,9 @@ colour::colour(defaultColours in)
     switch (in)
     {
     case 0:
-        r = 0;
-        g = 0;
-        b = 0;
+        r = 1;
+        g = 1;
+        b = 1;
         break;
     case 1:
         r = 255;

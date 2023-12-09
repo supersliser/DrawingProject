@@ -3,6 +3,6 @@
 
 void log(char* message)
 {
-    printf("Message Logged: %s||\n", message);
+    printf("Message Logged: %s\n", message);
     fflush(stdout);
 }
