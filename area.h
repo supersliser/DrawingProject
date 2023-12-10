@@ -60,11 +60,14 @@ class Canvas : public Area
 
 protected:
     colour CurrentColour;
-    void Fillr(SDL_Renderer *renderer, location PointLocation, colour inColour, colour *plane, size *CanvasSize, location* CanvasPosition);
+    void Fillr(SDL_Renderer *renderer, location PointLocation, colour sourceColour);
 
 public:
+    colour getPixelColour(SDL_Renderer *renderer, int width, int height, int x, int y);
+
+    void fill(SDL_Renderer *renderer, int wdth, int hght, int x, int y, colour src, colour dst);
     BrushType BrushMode;
     Canvas(Area *inParent);
     colour *getCurrentColour();
-    void Fill(SDL_Renderer *renderer, SDL_Window *window, colour inColour, location mouseLocation, size CanvasSize, location CanvasPosition);
+    void Fill(SDL_Renderer *renderer, SDL_Window *window, location mouseLocation);
 };

@@ -127,9 +127,9 @@ void Area::Draw(SDL_Renderer *renderer)
 	}
 	temp.w = Size.width;
 	temp.h = Size.height;
-	SDL_SetRenderDrawColor(renderer, BackColour.r, BackColour.g, BackColour.b, BackColour.a);
+	SDL_SetRenderDrawColor(renderer, BackColour.r, BackColour.g, BackColour.b, 255);
 	SDL_RenderFillRect(renderer, &temp);
-	SDL_SetRenderDrawColor(renderer, BorderColour.r, BorderColour.g, BorderColour.b, BorderColour.a);
+	SDL_SetRenderDrawColor(renderer, BorderColour.r, BorderColour.g, BorderColour.b, 255);
 	for (int i = 0; i < childCount; i++)
 	{
 		(*children[i]).Draw(renderer);
@@ -222,6 +222,7 @@ Canvas::Canvas(Area *inParent)
 	Size = size((*inParent).getSize().width - 40, (*inParent).getSize().height - 40);
 	BackColour = colour(white);
 	BorderColour = colour(white);
+	CurrentColour = black;
 }
 
 colour *Canvas::getCurrentColour()
@@ -229,64 +230,91 @@ colour *Canvas::getCurrentColour()
 	return &CurrentColour;
 }
 
-void Canvas::Fill(SDL_Renderer *renderer, SDL_Window *window, colour inColour, location mouseLocation, size CanvasSize, location CanvasPosition)
+colour Canvas::getPixelColour(SDL_Renderer *renderer, int width, int height, int x, int y)
 {
-	colour plane[CanvasSize.width * CanvasSize.height];
-	SDL_Surface *s = SDL_GetWindowSurface(window);
-	SDL_ConvertSurfaceFormat(s, SDL_PIXELFORMAT_RGB24, 0);
-	int y = 0;
-	for (int x = 0; x < sizeof(s); x += 3)
+	colour pcol;
+	Uint32 pixels[10]; /* pixel and safety buffer (although 1 should be enough) */
+	pcol.r = 0;
+	pcol.g = 0;
+	pcol.b = 0;
+	if (x >= 0 && x < width && y >= 0 && y < height) /* test if the coordinates are valid */
 	{
-		if (x / 3 == (*s).w)
-		{
-			y++;
-		}
-		colour pcol;
-		Uint32 pixel;
 		SDL_Rect rect; /* SDL rectangle of 1 pixel */
 		/* 2 helper structures to get SDL to generate the right pixel format */
-		SDL_Surface *s = SDL_CreateRGBSurface(0, 1, 1, 32, 0, 0, 0, 0);				/* helper 1 */
+		SDL_Surface *s = SDL_CreateRGBSurface(0, 5, 5, 32, 0, 0, 0, 0);				/* helper 1 */
 		SDL_Surface *ns = SDL_ConvertSurfaceFormat(s, SDL_PIXELFORMAT_ARGB8888, 0); /* 2 */
 		rect.x = x;
 		rect.y = y;
 		rect.w = 1;
 		rect.h = 1;
 		/* renderer, pixel, target format, target array, safety value 5 (1 was needed) */
-		if (!SDL_RenderReadPixels(renderer, &rect, SDL_PIXELFORMAT_ARGB8888, &pixel, 1))
+		if (!SDL_RenderReadPixels(renderer, &rect, SDL_PIXELFORMAT_ARGB8888, pixels, 5))
 		{ /* pixel, pixel format (from helper 2), colour channels by reference */
-			SDL_GetRGB(pixel, ns->format, &(pcol.r), &(pcol.g), &(pcol.b));
+			SDL_GetRGB(pixels[0], ns->format, &(pcol.r), &(pcol.g), &(pcol.b));
 		}
 		SDL_FreeSurface(s);	 /* free helper 1 */
 		SDL_FreeSurface(ns); /* free helper 2 */
-		plane[x + (y * CanvasSize.width)] = pcol;
 	}
-	log("Fake canvas Created");
-	SDL_SetRenderDrawColor(renderer, inColour.r, inColour.g, inColour.b, inColour.a);
-	printf("Canvas Position x= %d y=%d\n", CanvasPosition.x, CanvasPosition.y);
-	printf("Canvas Size x=%d y=%d\n", CanvasSize.width, CanvasSize.height);
-	Fillr(renderer, mouseLocation, inColour, plane, &CanvasSize, &CanvasPosition);
+	return pcol;
 }
 
-void Canvas::Fillr(SDL_Renderer *renderer, location PointLocation, colour inColour, colour *plane, size *CanvasSize, location *CanvasPosition)
+void Canvas::Fill(SDL_Renderer *renderer, SDL_Window *window, location mouseLocation)
 {
-	printf("PointLocation x= %d, y= %d\n", PointLocation.x, PointLocation.y);
-	printf("Canvas Colour %d %d %d\n", plane[PointLocation.x + (PointLocation.y * (*CanvasSize).width)].r, plane[PointLocation.x + (PointLocation.y * (*CanvasSize).width)].g, plane[PointLocation.x + (PointLocation.y * (*CanvasSize).width)].b);
+	// // SDL_LockSurface(surface);
+	// // surface = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_RGB24, 0);
+	// // Uint32 *pixel = (Uint32 *)surface->pixels;
+	// // (plane + x + (y * CanvasSize.width))->r = *(pixel + x * 3 + (y * 3 * CanvasSize.width));
+	// // (plane + x + (y * CanvasSize.width))->g = *(pixel + x * 3 + (y * 3 * CanvasSize.width) + 1);
+	// // (plane + x + (y * CanvasSize.width))->b = *(pixel + x * 3 + (y * 3 * CanvasSize.width) + 2);
+
+	// Uint32 pixels[10];
+	// SDL_Rect rect; /* SDL rectangle of 1 pixel */
+	// /* 2 helper structures to get SDL to generate the right pixel format */
+	// SDL_Surface *s = SDL_CreateRGBSurface(0, 5, 5, 32, 0, 0, 0, 0);				/* helper 1 */
+	// SDL_Surface *ns = SDL_ConvertSurfaceFormat(s, SDL_PIXELFORMAT_ARGB8888, 0); /* 2 */
+	// rect.x = x;
+	// rect.y = y;
+	// rect.w = 1;
+	// rect.h = 1;
+	// /* renderer, pixel, target format, target array, safety value 5 (1 was needed) */
+	// if (!SDL_RenderReadPixels(renderer, &rect, SDL_PIXELFORMAT_ARGB8888, pixels, 5))
+	// { /* pixel, pixel format (from helper 2), colour channels by reference */
+	// 	SDL_GetRGB(pixels[0], ns->format, &(plane[x + (y * CanvasSize.width)].r), &(plane[x + (y * CanvasSize.width)].g), &(plane[x + (y * CanvasSize.width)].b));
+	// }
+	// SDL_FreeSurface(s);	 /* free helper 1 */
+	// SDL_FreeSurface(ns); /* free helper 2 */
+	SDL_SetRenderDrawColor(renderer, CurrentColour.r, CurrentColour.g, CurrentColour.b, 255);
+	printf("Canvas Position x= %d y=%d\n", Position.x, Position.y);
+	printf("Canvas Size x=%d y=%d\n", Size.width, Size.height);
+	Fillr(renderer, mouseLocation, getPixelColour(renderer, Size.width, Size.height, mouseLocation.x, mouseLocation.y));
+	log("Fill Completed");
+}
+
+void Canvas::Fillr(SDL_Renderer *renderer, location PointLocation, colour sourceColour)
+{
+	colour pcol = getPixelColour(renderer, Size.width, Size.height, PointLocation.x, PointLocation.y);
+	printf("PointLocation x= %d, y= %d\n", PointLocation.x - Position.x, PointLocation.y - Position.y);
+	printf("Canvas Colour %d %d %d\n", pcol.r, pcol.g, pcol.b);
+	printf("Source Colour %d %d %d\n", sourceColour.r, sourceColour.g, sourceColour.b);
 	fflush(stdout);
-	if (PointLocation.x < CanvasPosition->x || PointLocation.y < CanvasPosition->y || PointLocation.x > CanvasSize->width || PointLocation.y > CanvasSize->height)
+	if (PointLocation.x - Position.x < 0 || PointLocation.y - Position.y < 0 || PointLocation.x - Position.x > Size.width || PointLocation.y - Position.y > Size.height)
 	{
 		log("Boundary Reached");
 		return;
 	}
-	if (plane[PointLocation.x + (PointLocation.y * (*CanvasSize).width)].r != 0 || plane[PointLocation.x + (PointLocation.y * (*CanvasSize).width)].g != 0 || plane[PointLocation.x + (PointLocation.y * (*CanvasSize).width)].b != 0 || plane[PointLocation.x + (PointLocation.y * (*CanvasSize).width)].r != 255 || plane[PointLocation.x + (PointLocation.y * (*CanvasSize).width)].g != 255 || plane[PointLocation.x + (PointLocation.y * (*CanvasSize).width)].b != 255)
+	if (pcol.r != sourceColour.r || pcol.g != sourceColour.g || pcol.b != sourceColour.b)
 	{
-		log("Colour Reached");
+		log("Colour Boundary Reached");
+		return;
+	}
+	if (sourceColour.r == CurrentColour.r && sourceColour.g == CurrentColour.g && sourceColour.b == CurrentColour.b)
+	{
+		log("Colour Boundary Also reached");
 		return;
 	}
 	SDL_RenderDrawPoint(renderer, PointLocation.x, PointLocation.y);
-	plane[PointLocation.x + (PointLocation.y * (*CanvasSize).width)] = inColour;
-	Fillr(renderer, location(PointLocation.x - 1, PointLocation.y), inColour, plane, CanvasSize, CanvasPosition);
-	// Fillr(renderer, location(PointLocation.x, PointLocation.y - 1), inColour, plane, CanvasSize, CanvasPosition);
-	// Fillr(renderer, location(PointLocation.x + 1, PointLocation.y), inColour, plane, CanvasSize, CanvasPosition);
-	// Fillr(renderer, location(PointLocation.x, PointLocation.y + 1), inColour, plane, CanvasSize, CanvasPosition);
-	log("kernal complete");
+	Fillr(renderer, location(PointLocation.x - 1, PointLocation.y), sourceColour);
+	Fillr(renderer, location(PointLocation.x, PointLocation.y + 1), sourceColour);
+	Fillr(renderer, location(PointLocation.x, PointLocation.y - 1), sourceColour);
+	Fillr(renderer, location(PointLocation.x + 1, PointLocation.y), sourceColour);
 }

@@ -24,7 +24,7 @@ void Window::CreateWindow(char *Name, location Position, size Size, colour Initi
     window = temp;
     SDL_Renderer *tempr = SDL_CreateRenderer(temp, -1, 0);
     renderer = tempr;
-    SDL_SetRenderDrawColor(renderer, InitialColour.r, InitialColour.g, InitialColour.b, InitialColour.a);
+    SDL_SetRenderDrawColor(renderer, InitialColour.r, InitialColour.g, InitialColour.b, 255);
     SDL_RenderClear(renderer);
     log("Cleared");
 }
@@ -86,7 +86,7 @@ CanvasWindow::CanvasWindow(char *WindowName, int ButtonSize)
     CanvasArea->addChild(CanvasItem);
     log("Canvas Created");
     log("items created");
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < 10; i++)
     {
         ColourButtons[i] = *new ColourButton(*(new location((*ColourArea).getPosition().x + 80 + ((int)(i / 2) * ButtonSize), (*ColourArea).getPosition().y + 20 + (ButtonSize * (i % 2)))), size(ButtonSize), colour((defaultColours)i), colour(255), window);
     }
@@ -98,7 +98,7 @@ void CanvasWindow::Draw()
     SDL_RenderClear(renderer);
     (*ColourArea).Draw(renderer, window);
     (*CanvasArea).Draw(renderer, window);
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < sizeof(ColourButtons) / sizeof(ColourButton); i++)
     {
         ColourButtons[i].Draw(renderer);
     }
@@ -107,9 +107,6 @@ void CanvasWindow::Draw()
 void CanvasWindow::Activate()
 {
     int i = 0;
-    SDL_Rect brush;
-    brush.w = 5;
-    brush.h = 5;
     bool finished = 0;
     bool drawing = 0;
     log("canvas window drawn");
@@ -144,7 +141,7 @@ void CanvasWindow::Activate()
                 drawing = 1;
                 if (event.button.y < ColourArea->getPosition().y + ColourArea->getSize().height)
                 {
-                    for (int i = 0; i < 8; i++)
+                    for (int i = 0; i < sizeof(ColourButtons) / sizeof(ColourButton); i++)
                     {
                         if (event.button.x >= ColourButtons[i].getPosition().x &&
                             event.button.x <= ColourButtons[i].getPosition().x + ColourButtons[i].getSize().width &&
@@ -152,14 +149,15 @@ void CanvasWindow::Activate()
                             event.button.y <= ColourButtons[i].getPosition().y + ColourButtons[i].getSize().height)
                         {
                             ColourButtons[i].Click((*CanvasItem).getCurrentColour());
-                            printf("current colour is %d, %d, %d, %d\n", (*CanvasItem).getCurrentColour()->r, (*CanvasItem).getCurrentColour()->g, (*CanvasItem).getCurrentColour()->b, (*CanvasItem).getCurrentColour()->a);
+                            printf("current colour is %d, %d, %d, %d\n", (*CanvasItem).getCurrentColour()->r, (*CanvasItem).getCurrentColour()->g, (*CanvasItem).getCurrentColour()->b, 255);
                             fflush(stdout);
                         }
                     }
                 }
                 if (CanvasItem->BrushMode == Fill)
                 {
-                    CanvasItem->Fill(renderer, window, *(CanvasItem->getCurrentColour()), location(event.button.x, event.button.y), CanvasItem->getSize(), CanvasItem->getPosition());
+                    CanvasItem->Fill(renderer, window, location(event.button.x, event.button.y));
+                    SDL_RenderPresent(renderer);
                 }
                 break;
             case SDL_MOUSEBUTTONUP:
@@ -170,9 +168,7 @@ void CanvasWindow::Activate()
                 {
                     if (event.button.y >= (*CanvasItem).getPosition().y && event.button.y <= (*CanvasItem).getPosition().y + (*CanvasItem).getSize().height && event.button.x >= (*CanvasItem).getPosition().x && event.button.x <= (*CanvasItem).getPosition().x + (*CanvasItem).getSize().width)
                     {
-                        SDL_SetRenderDrawColor(renderer, (*CanvasItem).getCurrentColour()->r, (*CanvasItem).getCurrentColour()->g, (*CanvasItem).getCurrentColour()->b, (*CanvasItem).getCurrentColour()->a);
-                        brush.x = event.button.x - 2;
-                        brush.y = event.button.y - 2;
+                        SDL_SetRenderDrawColor(renderer, (*CanvasItem).getCurrentColour()->r, (*CanvasItem).getCurrentColour()->g, (*CanvasItem).getCurrentColour()->b, 255);
                         SDL_RenderDrawLine(renderer, event.button.x - event.motion.xrel, event.button.y - event.motion.yrel, event.button.x, event.button.y);
                         SDL_RenderPresent(renderer);
                     }

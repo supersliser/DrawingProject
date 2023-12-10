@@ -30,7 +30,7 @@ public:
 class CanvasWindow : public Window
 {
 protected:
-    ColourButton ColourButtons[8];
+    ColourButton ColourButtons[10];
     ResizableArea* ColourArea;
     ResizableArea* CanvasArea;
     Canvas* CanvasItem;

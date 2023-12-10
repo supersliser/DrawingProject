@@ -9,7 +9,9 @@ enum defaultColours
     green = 4,
     lime = 5,
     darkBlue = 6,
-    lightBlue = 7
+    lightBlue = 7,
+    pink = 8,
+    purple = 9
 };
 
 class colour
@@ -18,7 +20,6 @@ public:
     Uint8 r;
     Uint8 g;
     Uint8 b;
-    Uint8 a;
     Uint8 convert(float in);
     float convert(Uint8 in);
     colour();
@@ -26,6 +27,5 @@ public:
     colour(Uint8 in);
     colour(Uint8 in, Uint8 inA);
     colour(Uint8 rIn, Uint8 gIn, Uint8 bIn);
-    colour(Uint8 rIn, Uint8 gIn, Uint8 bIn, Uint8 aIn);
 };
 

@@ -14,11 +14,9 @@ colour::colour()
     r = 0;
     g = 0;
     b = 0;
-    a = 255;
 }
 colour::colour(defaultColours in)
 {
-    a = 255;
     switch (in)
     {
     case 0:
@@ -61,10 +59,20 @@ colour::colour(defaultColours in)
         g = 0;
         b = 255;
         break;
+    case 8:
+        r = 255;
+        g = 105;
+        b = 217;
+        break;
+    case 9:
+        r = 155;
+        g = 47;
+        b = 237;
+        break;
     default:
-        r = 0;
-        g = 0;
-        b = 0;
+        r = 1;
+        g = 1;
+        b = 1;
         break;
     }
 }
@@ -73,26 +81,16 @@ colour::colour(Uint8 in)
     r = in;
     g = in;
     b = in;
-    a = 255;
 }
 colour::colour(Uint8 in, Uint8 inA)
 {
     r = in;
     g = in;
     b = in;
-    a = inA;
 }
 colour::colour(Uint8 rIn, Uint8 gIn, Uint8 bIn)
 {
     r = rIn;
     g = gIn;
     b = bIn;
-    a = 255;
-}
-colour::colour(Uint8 rIn, Uint8 gIn, Uint8 bIn, Uint8 aIn)
-{
-    r = rIn;
-    g = gIn;
-    b = bIn;
-    a = aIn;
 }
