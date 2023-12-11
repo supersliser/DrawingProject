@@ -94,3 +94,20 @@ colour::colour(Uint8 rIn, Uint8 gIn, Uint8 bIn)
     g = gIn;
     b = bIn;
 }
+
+void Brush::Draw(SDL_Renderer *renderer, location lOne, location lTwo, int num, int maxNum)
+{
+    if (num > 0)
+    {
+        SDL_SetRenderDrawColor(renderer, CurrentColour.r, CurrentColour.g, CurrentColour.b, 255 * (num / maxNum));
+        SDL_RenderDrawLine(renderer, lOne.x, lOne.y, lTwo.x, lTwo.y);
+        Draw(renderer, location(lOne.x - 1, lOne.y), location(lTwo.x - 1, lTwo.y), num - 1, maxNum);
+        Draw(renderer, location(lOne.x + 1, lOne.y), location(lTwo.x + 1, lTwo.y), num - 1, maxNum);
+        Draw(renderer, location(lOne.x, lOne.y - 1), location(lTwo.x, lTwo.y - 1), num - 1, maxNum);
+        Draw(renderer, location(lOne.x, lOne.y + 1), location(lTwo.x, lTwo.y + 1), num - 1, maxNum);
+    }
+    else
+    {
+        return;
+    }
+}

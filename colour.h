@@ -1,5 +1,6 @@
 #pragma once
 #include <SDL2/SDL.h>
+#include "location.h"
 enum defaultColours
 {
     black = 0,
@@ -40,4 +41,6 @@ class Brush
 public:
     colour CurrentColour;
     BrushType BrushMode;
+    int BrushSize;
+    void Draw(SDL_Renderer* renderer, location lOne, location lTwo, int num, int maxNum);
 };

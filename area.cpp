@@ -218,11 +218,13 @@ void ResizableArea::Draw(SDL_Renderer *renderer, SDL_Window *window)
 
 Canvas::Canvas(Area *inParent)
 {
-	Position = location((*inParent).getPosition().x + 20, (*inParent).getPosition().y + 20);
+	Position = location(20, 20);
 	Size = size((*inParent).getSize().width - 40, (*inParent).getSize().height - 40);
 	BackColour = colour(white);
 	BorderColour = colour(white);
 	BrushItem.CurrentColour = black;
+	BrushItem.BrushMode = Basic;
+	BrushItem.BrushSize = 2;
 }
 
 colour *Canvas::getCurrentColour()
@@ -230,15 +232,19 @@ colour *Canvas::getCurrentColour()
 	return &BrushItem.CurrentColour;
 }
 
-colour Canvas::getPixelColour(SDL_Renderer *renderer, int width, int height, int x, int y)
+colour Canvas::getPixelColour(SDL_Renderer *renderer, int x, int y)
 {
 	colour pcol;
 	Uint32 pixels[10]; /* pixel and safety buffer (although 1 should be enough) */
-	pcol.r = 0;
-	pcol.g = 0;
-	pcol.b = 0;
-	if (x >= 0 && x < width && y >= 0 && y < height) /* test if the coordinates are valid */
+	pcol.r = 255;
+	pcol.g = 255;
+	pcol.b = 255;
+	printf("size x= %d y= %d\n", width, height);
+	printf("positon x= %d y= %d\n", x, y);
+	fflush(stdout);
+	if (x >= 0 && x < Size.width + getPosition().x && y >= 0 && y < Size.height + getPosition().y) /* test if the coordinates are valid */
 	{
+		log("true");
 		SDL_Rect rect; /* SDL rectangle of 1 pixel */
 		/* 2 helper structures to get SDL to generate the right pixel format */
 		SDL_Surface *s = SDL_CreateRGBSurface(0, 5, 5, 32, 0, 0, 0, 0);				/* helper 1 */
@@ -260,44 +266,20 @@ colour Canvas::getPixelColour(SDL_Renderer *renderer, int width, int height, int
 
 void Canvas::Fill(SDL_Renderer *renderer, SDL_Window *window, location mouseLocation)
 {
-	// // SDL_LockSurface(surface);
-	// // surface = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_RGB24, 0);
-	// // Uint32 *pixel = (Uint32 *)surface->pixels;
-	// // (plane + x + (y * CanvasSize.width))->r = *(pixel + x * 3 + (y * 3 * CanvasSize.width));
-	// // (plane + x + (y * CanvasSize.width))->g = *(pixel + x * 3 + (y * 3 * CanvasSize.width) + 1);
-	// // (plane + x + (y * CanvasSize.width))->b = *(pixel + x * 3 + (y * 3 * CanvasSize.width) + 2);
-
-	// Uint32 pixels[10];
-	// SDL_Rect rect; /* SDL rectangle of 1 pixel */
-	// /* 2 helper structures to get SDL to generate the right pixel format */
-	// SDL_Surface *s = SDL_CreateRGBSurface(0, 5, 5, 32, 0, 0, 0, 0);				/* helper 1 */
-	// SDL_Surface *ns = SDL_ConvertSurfaceFormat(s, SDL_PIXELFORMAT_ARGB8888, 0); /* 2 */
-	// rect.x = x;
-	// rect.y = y;
-	// rect.w = 1;
-	// rect.h = 1;
-	// /* renderer, pixel, target format, target array, safety value 5 (1 was needed) */
-	// if (!SDL_RenderReadPixels(renderer, &rect, SDL_PIXELFORMAT_ARGB8888, pixels, 5))
-	// { /* pixel, pixel format (from helper 2), colour channels by reference */
-	// 	SDL_GetRGB(pixels[0], ns->format, &(plane[x + (y * CanvasSize.width)].r), &(plane[x + (y * CanvasSize.width)].g), &(plane[x + (y * CanvasSize.width)].b));
-	// }
-	// SDL_FreeSurface(s);	 /* free helper 1 */
-	// SDL_FreeSurface(ns); /* free helper 2 */
 	SDL_SetRenderDrawColor(renderer, BrushItem.CurrentColour.r, BrushItem.CurrentColour.g, BrushItem.CurrentColour.b, 255);
-	printf("Canvas Position x= %d y=%d\n", Position.x, Position.y);
-	printf("Canvas Size x=%d y=%d\n", Size.width, Size.height);
-	Fillr(renderer, mouseLocation, getPixelColour(renderer, Size.width, Size.height, mouseLocation.x, mouseLocation.y));
+	Fillr(renderer, mouseLocation, getPixelColour(renderer, mouseLocation.x, mouseLocation.y));
 	log("Fill Completed");
 }
 
 void Canvas::Fillr(SDL_Renderer *renderer, location PointLocation, colour sourceColour)
 {
-	colour pcol = getPixelColour(renderer, Size.width, Size.height, PointLocation.x, PointLocation.y);
-	printf("PointLocation x= %d, y= %d\n", PointLocation.x - Position.x, PointLocation.y - Position.y);
+	colour pcol = getPixelColour(renderer, PointLocation.x, PointLocation.y);
+	printf("Canvas PointLocation x= %d, y= %d\n", PointLocation.x - getPosition().x, PointLocation.y - getPosition().y);
+	printf("Canvas Size x= %d y= %d\n", Size.width, Size.height);
 	printf("Canvas Colour %d %d %d\n", pcol.r, pcol.g, pcol.b);
 	printf("Source Colour %d %d %d\n", sourceColour.r, sourceColour.g, sourceColour.b);
 	fflush(stdout);
-	if (PointLocation.x - Position.x < 0 || PointLocation.y - Position.y < 0 || PointLocation.x - Position.x > Size.width || PointLocation.y - Position.y > Size.height)
+	if (PointLocation.x < getPosition().x || PointLocation.y < getPosition().y || PointLocation.x > Size.width + getPosition().x || PointLocation.y > Size.height + getPosition().y)
 	{
 		log("Boundary Reached");
 		return;
@@ -314,7 +296,22 @@ void Canvas::Fillr(SDL_Renderer *renderer, location PointLocation, colour source
 	}
 	SDL_RenderDrawPoint(renderer, PointLocation.x, PointLocation.y);
 	Fillr(renderer, location(PointLocation.x - 1, PointLocation.y), sourceColour);
-	Fillr(renderer, location(PointLocation.x, PointLocation.y + 1), sourceColour);
 	Fillr(renderer, location(PointLocation.x, PointLocation.y - 1), sourceColour);
 	Fillr(renderer, location(PointLocation.x + 1, PointLocation.y), sourceColour);
+	Fillr(renderer, location(PointLocation.x, PointLocation.y + 1), sourceColour);
+}
+
+void Canvas::BrushDraw(SDL_Renderer *renderer, location lOne, location lTwo)
+{
+	BrushItem.Draw(renderer, lOne, lTwo, BrushItem.BrushSize, BrushItem.BrushSize);
+}
+
+BrushType *Canvas::getBrushType()
+{
+	return &(BrushItem.BrushMode);
+}
+
+int *Canvas::getBrushSize()
+{
+	return &(BrushItem.BrushSize);
 }

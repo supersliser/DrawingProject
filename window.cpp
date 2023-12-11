@@ -73,11 +73,11 @@ StarterWindow::StarterWindow(char *WindowName)
 
 CanvasWindow::CanvasWindow(char *WindowName, int ButtonSize)
 {
-    const size DefaultWindowSize = size(1800, 800);
+    const size DefaultWindowSize = size(600, 600);
     CreateWindow(WindowName, location(20, 20), DefaultWindowSize, colour(white), SDL_WINDOW_RESIZABLE);
     log("Window Created");
     fflush(stdout);
-    ColourArea = new ResizableArea(location(0), size(DefaultWindowSize.width, 120), colour(60), colour(white), 4, SizeLock::height, window);
+    ColourArea = new ResizableArea(location(0), size(DefaultWindowSize.width, 120), colour(40), colour(white), 4, SizeLock::height, window);
     log("Colour area created");
     CanvasArea = new ResizableArea(location(0, 120), size(DefaultWindowSize.width, DefaultWindowSize.height - ((*ColourArea).getSize().height * 2)), colour(128), colour(white), 0, SizeLock::width, window);
     log("Canvas area created");
@@ -86,9 +86,20 @@ CanvasWindow::CanvasWindow(char *WindowName, int ButtonSize)
     CanvasArea->addChild(CanvasItem);
     log("Canvas Created");
     log("items created");
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < sizeof(ColourButtons) / sizeof(ColourButton); i++)
     {
-        ColourButtons[i] = *new ColourButton(*(new location((*ColourArea).getPosition().x + 80 + ((int)(i / 2) * ButtonSize), (*ColourArea).getPosition().y + 20 + (ButtonSize * (i % 2)))), size(ButtonSize), colour((defaultColours)i), colour(255), window);
+        ColourButtons[i] = *new ColourButton(location(80 + ((int)(i / 2) * ButtonSize), 20 + (ButtonSize * (i % 2))), size(ButtonSize), colour((defaultColours)i), colour(255), window);
+        ColourArea->addChild(&(ColourButtons[i]));
+    }
+    for (int i = 0; i < sizeof(SizeButtons) / sizeof(SizeButton); i++)
+    {
+        SizeButtons[i] = *new SizeButton(location(20 + ColourButtons[9].getPosition().x + ColourButtons[9].getSize().width + (i * ButtonSize), 20), size(ButtonSize), colour(255 - (i * 64)), window, i + 1);
+        ColourArea->addChild(&(SizeButtons[i]));
+    }
+    for (int i = 0; i < sizeof(TypeButtons) / sizeof(TypeButton); i++)
+    {
+        TypeButtons[i] = *new TypeButton(location(20 + ColourButtons[9].getPosition().x + ColourButtons[9].getSize().width + (i * ButtonSize), 60), size(ButtonSize), window, (BrushType)i);
+        ColourArea->addChild(&(TypeButtons[i]));
     }
 }
 
@@ -98,10 +109,6 @@ void CanvasWindow::Draw()
     SDL_RenderClear(renderer);
     (*ColourArea).Draw(renderer, window);
     (*CanvasArea).Draw(renderer, window);
-    for (int i = 0; i < sizeof(ColourButtons) / sizeof(ColourButton); i++)
-    {
-        ColourButtons[i].Draw(renderer);
-    }
 }
 
 void CanvasWindow::Activate()
@@ -121,20 +128,11 @@ void CanvasWindow::Activate()
         {
             switch (event.type)
             {
-            case SDL_KEYDOWN:
-                switch (event.key.keysym.sym)
-                {
-                case SDLK_f:
-                    CanvasItem->BrushMode = Fill;
-                    break;
-                case SDLK_b:
-                    CanvasItem->BrushMode = Basic;
-                    break;
-                }
-                break;
             case SDL_WINDOWEVENT_RESIZED:
-                SDL_Surface* canvas = SDL_CreateRGBSurface(0, CanvasItem->getSize().width, CanvasItem->getSize().height, 32, 0, 0, 0, 0);
-                Uint32 pixels[CanvasItem->getSize().width * CanvasItem->getSize().height];
+            {
+                SDL_Surface *canvas = SDL_CreateRGBSurface(0, CanvasItem->getSize().width, CanvasItem->getSize().height, 32, 0, 0, 0, 0);
+                Uint32 *pixels;
+                pixels = (Uint32 *)malloc(CanvasItem->getSize().width * CanvasItem->getSize().height);
                 SDL_Rect rect;
                 rect.x = CanvasItem->getPosition().x;
                 rect.y = CanvasItem->getPosition().y;
@@ -142,14 +140,18 @@ void CanvasWindow::Activate()
                 rect.h = CanvasItem->getSize().height;
                 SDL_RenderReadPixels(renderer, &rect, SDL_PIXELFORMAT_ARGB8888, pixels, 0);
                 Draw();
-                SDL_Surface
+                SDL_RenderCopy(renderer, SDL_CreateTextureFromSurface(renderer, canvas), NULL, &rect);
                 break;
+            }
             case SDL_QUIT:
+            {
                 finished = 1;
                 Window::~Window();
                 log("window quitted");
                 break;
+            }
             case SDL_MOUSEBUTTONDOWN:
+            {
                 drawing = 1;
                 if (event.button.y < ColourArea->getPosition().y + ColourArea->getSize().height)
                 {
@@ -165,35 +167,58 @@ void CanvasWindow::Activate()
                             fflush(stdout);
                         }
                     }
+                    for (int i = 0; i < sizeof(SizeButtons) / sizeof(SizeButton); i++)
+                    {
+                        if (event.button.x >= SizeButtons[i].getPosition().x &&
+                            event.button.x <= SizeButtons[i].getPosition().x + SizeButtons[i].getSize().width &&
+                            event.button.y >= SizeButtons[i].getPosition().y &&
+                            event.button.y <= SizeButtons[i].getPosition().y + SizeButtons[i].getSize().height)
+                        {
+                            SizeButtons[i].Click(CanvasItem->getBrushSize());
+                            printf("current brush size is %d\n", *(CanvasItem->getBrushSize()));
+                            fflush(stdout);
+                        }
+                    }
+                    for (int i = 0; i < sizeof(TypeButtons) / sizeof(TypeButton); i++)
+                    {
+                        if (event.button.x >= TypeButtons[i].getPosition().x &&
+                            event.button.x <= TypeButtons[i].getPosition().x + TypeButtons[i].getSize().width &&
+                            event.button.y >= TypeButtons[i].getPosition().y &&
+                            event.button.y <= TypeButtons[i].getPosition().y + TypeButtons[i].getSize().height)
+                        {
+                            TypeButtons[i].Click(CanvasItem->getBrushType());
+                            printf("current brush type is %d\n", (int)*(CanvasItem->getBrushType()));
+                            fflush(stdout);
+                        }
+                    }
                 }
-                if (CanvasItem->BrushMode == Fill)
+                if (*(CanvasItem->getBrushType()) == Fill && (event.button.x >= CanvasItem->getPosition().x &&
+                            event.button.x <= CanvasItem->getPosition().x + CanvasItem->getSize().width &&
+                            event.button.y >= CanvasItem->getPosition().y &&
+                            event.button.y <= CanvasItem->getPosition().y + CanvasItem->getSize().height))
                 {
                     CanvasItem->Fill(renderer, window, location(event.button.x, event.button.y));
                     SDL_RenderPresent(renderer);
                 }
                 break;
+            }
             case SDL_MOUSEBUTTONUP:
+            {
                 drawing = 0;
                 break;
+            }
             case SDL_MOUSEMOTION:
-                if (drawing && CanvasItem->BrushMode == Basic)
+            {
+                if (drawing && *(CanvasItem->getBrushType()) == Basic)
                 {
                     if (event.button.y >= (*CanvasItem).getPosition().y && event.button.y <= (*CanvasItem).getPosition().y + (*CanvasItem).getSize().height && event.button.x >= (*CanvasItem).getPosition().x && event.button.x <= (*CanvasItem).getPosition().x + (*CanvasItem).getSize().width)
                     {
-                        SDL_SetRenderDrawColor(renderer, (*CanvasItem).getCurrentColour()->r, (*CanvasItem).getCurrentColour()->g, (*CanvasItem).getCurrentColour()->b, 255);
-                        SDL_RenderDrawLine(renderer, event.button.x - event.motion.xrel, event.button.y - event.motion.yrel, event.button.x, event.button.y);
-                        SDL_RenderDrawLine(renderer, event.button.x - event.motion.xrel - 1, event.button.y - event.motion.yrel, event.button.x - 1, event.button.y);
-                        SDL_RenderDrawLine(renderer, event.button.x - event.motion.xrel + 1, event.button.y - event.motion.yrel, event.button.x + 1, event.button.y);
-                        SDL_RenderDrawLine(renderer, event.button.x - event.motion.xrel, event.button.y - event.motion.yrel - 1, event.button.x, event.button.y - 1);
-                        SDL_RenderDrawLine(renderer, event.button.x - event.motion.xrel - 1, event.button.y - event.motion.yrel - 1, event.button.x - 1, event.button.y - 1);
-                        SDL_RenderDrawLine(renderer, event.button.x - event.motion.xrel + 1, event.button.y - event.motion.yrel - 1, event.button.x + 1, event.button.y - 1);
-                        SDL_RenderDrawLine(renderer, event.button.x - event.motion.xrel, event.button.y - event.motion.yrel + 1, event.button.x, event.button.y + 1);
-                        SDL_RenderDrawLine(renderer, event.button.x - event.motion.xrel - 1, event.button.y - event.motion.yrel + 1, event.button.x - 1, event.button.y + 1);
-                        SDL_RenderDrawLine(renderer, event.button.x - event.motion.xrel + 1, event.button.y - event.motion.yrel + 1, event.button.x + 1, event.button.y + 1);
+                        CanvasItem->BrushDraw(renderer, location(event.button.x - event.motion.xrel - 1, event.button.y - event.motion.yrel), location(event.button.x - 1, event.button.y));
                         SDL_RenderPresent(renderer);
                     }
                 }
                 break;
+            }
             }
         }
     }

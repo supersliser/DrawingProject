@@ -17,3 +17,26 @@ class ColourButton : public Button
 public:
     void Click(colour *CurrentColour);
 };
+
+class SizeButton : public Button
+{
+    int SizeData;
+
+public:
+    SizeButton();
+    SizeButton(location inPosition, size inSize, colour inBC, SDL_Window *window, int SizeItem);
+
+    void Click(int *CurrentSize);
+};
+
+class TypeButton : public Button
+{
+    BrushType Type;
+
+public:
+    TypeButton();
+    TypeButton(location inPosition, size inSize, SDL_Window *window, BrushType inType);
+
+    void Click(BrushType *inType);
+    void Draw(SDL_Renderer *renderer);
+};
