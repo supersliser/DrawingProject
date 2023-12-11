@@ -49,17 +49,12 @@ protected:
     margin Margin;
 };
 
-enum BrushType
-{
-    Basic = 0,
-    Fill
-};
 class Canvas : public Area
 {
     using Area::Area;
 
 protected:
-    colour CurrentColour;
+    Brush BrushItem;
     void Fillr(SDL_Renderer *renderer, location PointLocation, colour sourceColour);
 
 public:

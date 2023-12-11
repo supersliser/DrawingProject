@@ -14,6 +14,12 @@ enum defaultColours
     purple = 9
 };
 
+enum BrushType
+{
+    Basic = 0,
+    Fill
+};
+
 class colour
 {
 public:
@@ -29,3 +35,9 @@ public:
     colour(Uint8 rIn, Uint8 gIn, Uint8 bIn);
 };
 
+class Brush
+{
+public:
+    colour CurrentColour;
+    BrushType BrushMode;
+};

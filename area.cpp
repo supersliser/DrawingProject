@@ -222,12 +222,12 @@ Canvas::Canvas(Area *inParent)
 	Size = size((*inParent).getSize().width - 40, (*inParent).getSize().height - 40);
 	BackColour = colour(white);
 	BorderColour = colour(white);
-	CurrentColour = black;
+	BrushItem.CurrentColour = black;
 }
 
 colour *Canvas::getCurrentColour()
 {
-	return &CurrentColour;
+	return &BrushItem.CurrentColour;
 }
 
 colour Canvas::getPixelColour(SDL_Renderer *renderer, int width, int height, int x, int y)
@@ -283,7 +283,7 @@ void Canvas::Fill(SDL_Renderer *renderer, SDL_Window *window, location mouseLoca
 	// }
 	// SDL_FreeSurface(s);	 /* free helper 1 */
 	// SDL_FreeSurface(ns); /* free helper 2 */
-	SDL_SetRenderDrawColor(renderer, CurrentColour.r, CurrentColour.g, CurrentColour.b, 255);
+	SDL_SetRenderDrawColor(renderer, BrushItem.CurrentColour.r, BrushItem.CurrentColour.g, BrushItem.CurrentColour.b, 255);
 	printf("Canvas Position x= %d y=%d\n", Position.x, Position.y);
 	printf("Canvas Size x=%d y=%d\n", Size.width, Size.height);
 	Fillr(renderer, mouseLocation, getPixelColour(renderer, Size.width, Size.height, mouseLocation.x, mouseLocation.y));
@@ -307,7 +307,7 @@ void Canvas::Fillr(SDL_Renderer *renderer, location PointLocation, colour source
 		log("Colour Boundary Reached");
 		return;
 	}
-	if (sourceColour.r == CurrentColour.r && sourceColour.g == CurrentColour.g && sourceColour.b == CurrentColour.b)
+	if (sourceColour.r == BrushItem.CurrentColour.r && sourceColour.g == BrushItem.CurrentColour.g && sourceColour.b == BrushItem.CurrentColour.b)
 	{
 		log("Colour Boundary Also reached");
 		return;

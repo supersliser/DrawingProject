@@ -132,6 +132,18 @@ void CanvasWindow::Activate()
                     break;
                 }
                 break;
+            case SDL_WINDOWEVENT_RESIZED:
+                SDL_Surface* canvas = SDL_CreateRGBSurface(0, CanvasItem->getSize().width, CanvasItem->getSize().height, 32, 0, 0, 0, 0);
+                Uint32 pixels[CanvasItem->getSize().width * CanvasItem->getSize().height];
+                SDL_Rect rect;
+                rect.x = CanvasItem->getPosition().x;
+                rect.y = CanvasItem->getPosition().y;
+                rect.w = CanvasItem->getSize().width;
+                rect.h = CanvasItem->getSize().height;
+                SDL_RenderReadPixels(renderer, &rect, SDL_PIXELFORMAT_ARGB8888, pixels, 0);
+                Draw();
+                SDL_Surface
+                break;
             case SDL_QUIT:
                 finished = 1;
                 Window::~Window();
@@ -170,6 +182,14 @@ void CanvasWindow::Activate()
                     {
                         SDL_SetRenderDrawColor(renderer, (*CanvasItem).getCurrentColour()->r, (*CanvasItem).getCurrentColour()->g, (*CanvasItem).getCurrentColour()->b, 255);
                         SDL_RenderDrawLine(renderer, event.button.x - event.motion.xrel, event.button.y - event.motion.yrel, event.button.x, event.button.y);
+                        SDL_RenderDrawLine(renderer, event.button.x - event.motion.xrel - 1, event.button.y - event.motion.yrel, event.button.x - 1, event.button.y);
+                        SDL_RenderDrawLine(renderer, event.button.x - event.motion.xrel + 1, event.button.y - event.motion.yrel, event.button.x + 1, event.button.y);
+                        SDL_RenderDrawLine(renderer, event.button.x - event.motion.xrel, event.button.y - event.motion.yrel - 1, event.button.x, event.button.y - 1);
+                        SDL_RenderDrawLine(renderer, event.button.x - event.motion.xrel - 1, event.button.y - event.motion.yrel - 1, event.button.x - 1, event.button.y - 1);
+                        SDL_RenderDrawLine(renderer, event.button.x - event.motion.xrel + 1, event.button.y - event.motion.yrel - 1, event.button.x + 1, event.button.y - 1);
+                        SDL_RenderDrawLine(renderer, event.button.x - event.motion.xrel, event.button.y - event.motion.yrel + 1, event.button.x, event.button.y + 1);
+                        SDL_RenderDrawLine(renderer, event.button.x - event.motion.xrel - 1, event.button.y - event.motion.yrel + 1, event.button.x - 1, event.button.y + 1);
+                        SDL_RenderDrawLine(renderer, event.button.x - event.motion.xrel + 1, event.button.y - event.motion.yrel + 1, event.button.x + 1, event.button.y + 1);
                         SDL_RenderPresent(renderer);
                     }
                 }
