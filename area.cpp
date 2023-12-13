@@ -130,10 +130,21 @@ void Area::Draw(SDL_Renderer *renderer)
 	SDL_SetRenderDrawColor(renderer, BackColour.r, BackColour.g, BackColour.b, 255);
 	SDL_RenderFillRect(renderer, &temp);
 	SDL_SetRenderDrawColor(renderer, BorderColour.r, BorderColour.g, BorderColour.b, 255);
+	SDL_RenderDrawRect(renderer, &temp);
 	for (int i = 0; i < childCount; i++)
 	{
 		(*children[i]).Draw(renderer);
 	}
+}
+
+SDL_Rect* Area::getRect()
+{
+	SDL_Rect output;
+	output.x = getPosition().x;
+	output.y = getPosition().y;
+	output.w = getSize().width;
+	output.h = getSize().height;
+	return &output;
 }
 
 ResizableArea::ResizableArea(location inPosition, size inSize, colour inBC, colour inBorderC, int inBW, SizeLock inLock, SDL_Window *window)

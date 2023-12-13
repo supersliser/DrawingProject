@@ -71,15 +71,14 @@ StarterWindow::StarterWindow(char *WindowName)
     CreateWindow(WindowName, location(500, 600), size(200, 200), colour(white), SDL_WINDOW_RESIZABLE);
 }
 
-CanvasWindow::CanvasWindow(char *WindowName, int ButtonSize)
+CanvasWindow::CanvasWindow(char *WindowName, int ButtonSize, size WindowSize)
 {
-    const size DefaultWindowSize = size(600, 600);
-    CreateWindow(WindowName, location(20, 20), DefaultWindowSize, colour(white), SDL_WINDOW_RESIZABLE);
+    CreateWindow(WindowName, location(20, 20), WindowSize, colour(white), 0);
     log("Window Created");
     fflush(stdout);
-    ColourArea = new ResizableArea(location(0), size(DefaultWindowSize.width, 120), colour(40), colour(white), 4, SizeLock::height, window);
+    ColourArea = new ResizableArea(location(0), size(WindowSize.width, 120), colour(40), colour(white), 4, SizeLock::height, window);
     log("Colour area created");
-    CanvasArea = new ResizableArea(location(0, 120), size(DefaultWindowSize.width, DefaultWindowSize.height - ((*ColourArea).getSize().height * 2)), colour(128), colour(white), 0, SizeLock::width, window);
+    CanvasArea = new ResizableArea(location(0, 120), size(WindowSize.width, WindowSize.height - ((*ColourArea).getSize().height * 2)), colour(128), colour(white), 0, SizeLock::none, window);
     log("Canvas area created");
     size Temp = size(0, 0);
     CanvasItem = new Canvas(CanvasArea);
@@ -105,10 +104,9 @@ CanvasWindow::CanvasWindow(char *WindowName, int ButtonSize)
 
 void CanvasWindow::Draw()
 {
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-    SDL_RenderClear(renderer);
     (*ColourArea).Draw(renderer, window);
     (*CanvasArea).Draw(renderer, window);
+    SDL_RenderPresent(renderer);
 }
 
 void CanvasWindow::Activate()
@@ -119,7 +117,6 @@ void CanvasWindow::Activate()
     log("canvas window drawn");
     log("canvas window event loop entered");
     Draw();
-    SDL_RenderPresent(renderer);
 
     while (!finished)
     {
@@ -128,21 +125,6 @@ void CanvasWindow::Activate()
         {
             switch (event.type)
             {
-            case SDL_WINDOWEVENT_RESIZED:
-            {
-                SDL_Surface *canvas = SDL_CreateRGBSurface(0, CanvasItem->getSize().width, CanvasItem->getSize().height, 32, 0, 0, 0, 0);
-                Uint32 *pixels;
-                pixels = (Uint32 *)malloc(CanvasItem->getSize().width * CanvasItem->getSize().height);
-                SDL_Rect rect;
-                rect.x = CanvasItem->getPosition().x;
-                rect.y = CanvasItem->getPosition().y;
-                rect.w = CanvasItem->getSize().width;
-                rect.h = CanvasItem->getSize().height;
-                SDL_RenderReadPixels(renderer, &rect, SDL_PIXELFORMAT_ARGB8888, pixels, 0);
-                Draw();
-                SDL_RenderCopy(renderer, SDL_CreateTextureFromSurface(renderer, canvas), NULL, &rect);
-                break;
-            }
             case SDL_QUIT:
             {
                 finished = 1;
@@ -193,9 +175,9 @@ void CanvasWindow::Activate()
                     }
                 }
                 if (*(CanvasItem->getBrushType()) == Fill && (event.button.x >= CanvasItem->getPosition().x &&
-                            event.button.x <= CanvasItem->getPosition().x + CanvasItem->getSize().width &&
-                            event.button.y >= CanvasItem->getPosition().y &&
-                            event.button.y <= CanvasItem->getPosition().y + CanvasItem->getSize().height))
+                                                              event.button.x <= CanvasItem->getPosition().x + CanvasItem->getSize().width &&
+                                                              event.button.y >= CanvasItem->getPosition().y &&
+                                                              event.button.y <= CanvasItem->getPosition().y + CanvasItem->getSize().height))
                 {
                     CanvasItem->Fill(renderer, window, location(event.button.x, event.button.y));
                     SDL_RenderPresent(renderer);

@@ -32,6 +32,7 @@ public:
     colour getBackColour();
     colour getBorderColour();
     void Draw(SDL_Renderer *renderer);
+    SDL_Rect* getRect();
 };
 
 class ResizableArea : public Area
@@ -63,8 +64,8 @@ public:
     void fill(SDL_Renderer *renderer, int wdth, int hght, int x, int y, colour src, colour dst);
     Canvas(Area *inParent);
     colour *getCurrentColour();
-    BrushType* getBrushType();
-    int* getBrushSize();
+    BrushType *getBrushType();
+    int *getBrushSize();
     void Fill(SDL_Renderer *renderer, SDL_Window *window, location mouseLocation);
     void BrushDraw(SDL_Renderer *renderer, location lOne, location lTwo);
 };
