@@ -109,14 +109,11 @@ CanvasWindow::CanvasWindow(char *WindowName, int ButtonSize, size WindowSize, ch
     log("Window Created");
     fflush(stdout);
     ColourArea = new ResizableArea(location(0), size(WindowSize.width, 120), colour(40), colour(white), 4, SizeLock::height, window);
-    log("Colour area created");
     CanvasArea = new ResizableArea(location(0, 120), size(WindowSize.width, WindowSize.height - ((*ColourArea).getSize().height * 2)), colour(128), colour(white), 0, SizeLock::none, window);
-    log("Canvas area created");
     size Temp = size(0, 0);
     CanvasItem = new Canvas(CanvasArea);
     CanvasArea->addChild(CanvasItem);
     log("Canvas Created");
-    log("items created");
     for (int i = 0; i < sizeof(ColourButtons) / sizeof(ColourButton); i++)
     {
         ColourButtons[i] = *new ColourButton(location(80 + ((int)(i / 2) * ButtonSize), 20 + (ButtonSize * (i % 2))), size(ButtonSize), colour((defaultColours)i), colour(255), window);
@@ -151,13 +148,16 @@ void CanvasWindow::Activate()
     log("canvas window drawn");
     log("canvas window event loop entered");
     Draw();
+    // SDL_RenderSetClipRect(renderer, CanvasItem->getRect());
     if (ImageExists)
     {
         inputImage.DrawImage(renderer, CanvasItem->getRect());
+        SDL_RenderPresent(renderer);
+        log("image drawn");
     }
-
     while (!finished)
     {
+
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
@@ -212,10 +212,11 @@ void CanvasWindow::Activate()
                         }
                     }
                 }
-                if (*(CanvasItem->getBrushType()) == Fill && (event.button.x >= CanvasItem->getPosition().x &&
-                                                              event.button.x <= CanvasItem->getPosition().x + CanvasItem->getSize().width &&
-                                                              event.button.y >= CanvasItem->getPosition().y &&
-                                                              event.button.y <= CanvasItem->getPosition().y + CanvasItem->getSize().height))
+                if (*(CanvasItem->getBrushType()) == Fill &&
+                    (event.button.x >= CanvasItem->getPosition().x &&
+                     event.button.x <= CanvasItem->getPosition().x + CanvasItem->getSize().width &&
+                     event.button.y >= CanvasItem->getPosition().y &&
+                     event.button.y <= CanvasItem->getPosition().y + CanvasItem->getSize().height))
                 {
                     CanvasItem->Fill(renderer, window, location(event.button.x, event.button.y));
                     SDL_RenderPresent(renderer);

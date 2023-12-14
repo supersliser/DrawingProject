@@ -41,7 +41,7 @@ colour::colour(defaultColours in)
         break;
     case 4:
         r = 0;
-        g = 50;
+        g = 128;
         b = 0;
         break;
     case 5:
@@ -51,8 +51,8 @@ colour::colour(defaultColours in)
         break;
     case 6:
         r = 0;
-        g = 0;
-        b = 50;
+        g = 208;
+        b = 255;
         break;
     case 7:
         r = 0;
@@ -99,7 +99,7 @@ void Brush::Draw(SDL_Renderer *renderer, location lOne, location lTwo, int num, 
 {
     if (num > 0)
     {
-        SDL_SetRenderDrawColor(renderer, CurrentColour.r, CurrentColour.g, CurrentColour.b, 255 * (num / maxNum));
+        SDL_SetRenderDrawColor(renderer, CurrentColour.r, CurrentColour.g, CurrentColour.b, (Uint8)(int)(255 * (num / maxNum)));
         SDL_RenderDrawLine(renderer, lOne.x, lOne.y, lTwo.x, lTwo.y);
         Draw(renderer, location(lOne.x - 1, lOne.y), location(lTwo.x - 1, lTwo.y), num - 1, maxNum);
         Draw(renderer, location(lOne.x + 1, lOne.y), location(lTwo.x + 1, lTwo.y), num - 1, maxNum);

@@ -16,6 +16,7 @@ protected:
     imageExtention ext;
     char *getFilename();
     char *getFileLocation();
+    SDL_Surface* ImageData = nullptr;
 
 public:
     Image();

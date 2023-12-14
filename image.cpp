@@ -62,7 +62,11 @@ Image::Image(char *inFileLocation)
 
 SDL_Surface *Image::getSurface()
 {
-    return IMG_Load(fullPath);
+    if (ImageData == nullptr)
+    {
+        ImageData = IMG_Load(fullPath);
+    }
+    return ImageData;
 }
 
 SDL_Texture *Image::getTexture(SDL_Renderer *renderer)
@@ -72,5 +76,10 @@ SDL_Texture *Image::getTexture(SDL_Renderer *renderer)
 
 void Image::DrawImage(SDL_Renderer *renderer, SDL_Rect *Canvas)
 {
-    SDL_RenderCopy(renderer, getTexture(renderer), NULL, Canvas);
+    SDL_Texture * temp = getTexture(renderer);
+    SDL_SetTextureBlendMode(temp, SDL_BLENDMODE_BLEND);
+    SDL_SetTextureAlphaMod(temp, 255);
+    SDL_SetTextureColorMod(temp, 255, 255, 255);
+    SDL_RenderCopy(renderer, temp, NULL, Canvas);
+    SDL_RenderPresent(renderer);
 }

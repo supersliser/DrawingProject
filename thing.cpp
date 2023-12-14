@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <SDL2/SDL_image.h>
+#include "log.h"
 
 bool checkStringIsNum(char *in)
 {
@@ -29,7 +30,7 @@ int main(int argc, char *argv[])
     }
     char windowname[18] = "Drawence Dellalio";
     size windowSize = size(800, 800);
-    char *inputFile;
+    char *inputFile = "NULL";
 
     if (argc == 3)
     {
@@ -41,7 +42,7 @@ int main(int argc, char *argv[])
     else if (argc == 2)
     {
         inputFile = argv[1];
-        IMG_Init(IMG_INIT_JPG|IMG_INIT_PNG|IMG_INIT_TIF|IMG_INIT_WEBP);
+        IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP);
     }
     else if (argc == 4)
     {
@@ -50,15 +51,23 @@ int main(int argc, char *argv[])
             windowSize = size(atoi(argv[1]), atoi(argv[2]));
         }
         inputFile = argv[3];
-        IMG_Init(IMG_INIT_JPG|IMG_INIT_PNG|IMG_INIT_TIF|IMG_INIT_WEBP);
+        IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP);
     }
-    CanvasWindow mainWindow = *new CanvasWindow(windowname, 25, windowSize);
-    mainWindow.Activate();
 
-    if (sizeof(inputFile) > 0)
+
+    if (inputFile != "NULL")
     {
+        log("image detected");
+        CanvasWindow mainWindow = *new CanvasWindow(windowname, 25, windowSize, inputFile);
+        mainWindow.Activate();
         IMG_Quit();
     }
+    else
+    {
+        CanvasWindow mainWindow = *new CanvasWindow(windowname, 25, windowSize);
+        mainWindow.Activate();
+    }
+
     SDL_Quit();
     return 0;
 }

@@ -162,16 +162,13 @@ ResizableArea::ResizableArea(location inPosition, size inSize, colour inBC, colo
 	BackColour = inBC;
 	BorderColour = inBorderC;
 	lock = inLock;
-	log("properties assigned");
 	size Temp = size(0, 0);
 	SDL_GetWindowSize(window, &Temp.width, &Temp.height);
-	printf("window size is x= %d, y= %d\n", Temp.width, Temp.height);
 	fflush(stdout);
 	Margin.top = Position.y;
 	Margin.left = Position.x;
 	Margin.bottom = Temp.height - (Margin.top + Size.height);
 	Margin.right = Temp.width - (Margin.left + Size.width);
-	log("margin assigned");
 }
 ResizableArea::ResizableArea(location inPosition, size inSize, colour inBC, colour inBorderC, int inBW, SizeLock inLock, Area *Parent, SDL_Window *window)
 {
