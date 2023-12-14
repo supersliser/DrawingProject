@@ -145,13 +145,14 @@ void CanvasWindow::Activate()
     int i = 0;
     bool finished = 0;
     bool drawing = 0;
+    bool ctrl = false;
     log("canvas window drawn");
     log("canvas window event loop entered");
     Draw();
     // SDL_RenderSetClipRect(renderer, CanvasItem->getRect());
     if (ImageExists)
     {
-        inputImage.DrawImage(renderer, CanvasItem->getRect());
+        inputImage.DrawImage(renderer, *(CanvasItem->getRect()));
         SDL_RenderPresent(renderer);
         log("image drawn");
     }
@@ -170,6 +171,29 @@ void CanvasWindow::Activate()
                 log("window quitted");
                 break;
             }
+            case SDL_KEYDOWN:
+                if (event.key.keysym.sym == SDLK_s && ctrl)
+                {
+                    log("attempting image save");
+                    if (ImageExists)
+                    {
+                        inputImage.SaveImage(window, *(CanvasItem->getRect()));
+                    }
+                    else
+                    {
+                        //code here for new file
+                    }
+                }
+                else if (event.key.keysym.sym == SDLK_LCTRL || event.key.keysym.sym == SDLK_RCTRL)
+                {
+                    ctrl = true;
+                }
+            break;
+            case SDL_KEYUP:
+                if (event.key.keysym.sym == SDLK_LCTRL || event.key.keysym.sym == SDLK_RCTRL)
+                {
+                    ctrl = false;
+                }
             case SDL_MOUSEBUTTONDOWN:
             {
                 drawing = 1;

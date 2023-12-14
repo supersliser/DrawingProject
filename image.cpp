@@ -1,4 +1,5 @@
 #include "image.h"
+#include "log.h"
 
 char *Image::getFilename()
 {
@@ -60,6 +61,26 @@ Image::Image(char *inFileLocation)
     fullPath = inFileLocation;
 }
 
+void Image::SaveImage(SDL_Window *window, SDL_Rect Canvas)
+{
+    SDL_Surface *temp;
+    temp = SDL_GetWindowSurface(window);
+    SDL_SetClipRect(temp, &Canvas);
+    switch (ext)
+    {
+    case JPG:
+    {
+        IMG_SaveJPG(temp, fullPath, 100);
+    }
+    break;
+    default:
+    {
+        IMG_SavePNG(temp, fullPath);
+    }
+    }
+    log("image Saved");
+}
+
 SDL_Surface *Image::getSurface()
 {
     if (ImageData == nullptr)
@@ -74,12 +95,17 @@ SDL_Texture *Image::getTexture(SDL_Renderer *renderer)
     return SDL_CreateTextureFromSurface(renderer, getSurface());
 }
 
-void Image::DrawImage(SDL_Renderer *renderer, SDL_Rect *Canvas)
+void Image::DrawImage(SDL_Renderer *renderer, SDL_Rect Canvas)
 {
-    SDL_Texture * temp = getTexture(renderer);
+    SDL_Texture *temp = getTexture(renderer);
     SDL_SetTextureBlendMode(temp, SDL_BLENDMODE_BLEND);
     SDL_SetTextureAlphaMod(temp, 255);
     SDL_SetTextureColorMod(temp, 255, 255, 255);
-    SDL_RenderCopy(renderer, temp, NULL, Canvas);
+    SDL_RenderCopy(renderer, temp, NULL, &Canvas);
     SDL_RenderPresent(renderer);
+}
+
+imageExtention Image::getExt()
+{
+    return ext;
 }
