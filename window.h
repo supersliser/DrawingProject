@@ -3,6 +3,7 @@
 #include "location.h"
 #include "colour.h"
 #include "button.h"
+#include "image.h"
 
 class Window
 {
@@ -37,9 +38,12 @@ protected:
     ResizableArea *ColourArea;
     ResizableArea *CanvasArea;
     Canvas *CanvasItem;
+    Image inputImage;
+    bool ImageExists;
 
 public:
     CanvasWindow(char *WindowName, int ButtonSize, size WindowSize);
+    CanvasWindow(char *WindowName, int ButtonSize, size WindowSize, char* inFileLocation);
     void Activate();
     void Draw();
 };

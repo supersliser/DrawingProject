@@ -100,6 +100,40 @@ CanvasWindow::CanvasWindow(char *WindowName, int ButtonSize, size WindowSize)
         TypeButtons[i] = *new TypeButton(location(20 + ColourButtons[9].getPosition().x + ColourButtons[9].getSize().width + (i * ButtonSize), 60), size(ButtonSize), window, (BrushType)i);
         ColourArea->addChild(&(TypeButtons[i]));
     }
+    ImageExists = false;
+}
+
+CanvasWindow::CanvasWindow(char *WindowName, int ButtonSize, size WindowSize, char *inFileLocation)
+{
+    CreateWindow(WindowName, location(20, 20), WindowSize, colour(white), 0);
+    log("Window Created");
+    fflush(stdout);
+    ColourArea = new ResizableArea(location(0), size(WindowSize.width, 120), colour(40), colour(white), 4, SizeLock::height, window);
+    log("Colour area created");
+    CanvasArea = new ResizableArea(location(0, 120), size(WindowSize.width, WindowSize.height - ((*ColourArea).getSize().height * 2)), colour(128), colour(white), 0, SizeLock::none, window);
+    log("Canvas area created");
+    size Temp = size(0, 0);
+    CanvasItem = new Canvas(CanvasArea);
+    CanvasArea->addChild(CanvasItem);
+    log("Canvas Created");
+    log("items created");
+    for (int i = 0; i < sizeof(ColourButtons) / sizeof(ColourButton); i++)
+    {
+        ColourButtons[i] = *new ColourButton(location(80 + ((int)(i / 2) * ButtonSize), 20 + (ButtonSize * (i % 2))), size(ButtonSize), colour((defaultColours)i), colour(255), window);
+        ColourArea->addChild(&(ColourButtons[i]));
+    }
+    for (int i = 0; i < sizeof(SizeButtons) / sizeof(SizeButton); i++)
+    {
+        SizeButtons[i] = *new SizeButton(location(20 + ColourButtons[9].getPosition().x + ColourButtons[9].getSize().width + (i * ButtonSize), 20), size(ButtonSize), colour(255 - (i * 64)), window, i + 1);
+        ColourArea->addChild(&(SizeButtons[i]));
+    }
+    for (int i = 0; i < sizeof(TypeButtons) / sizeof(TypeButton); i++)
+    {
+        TypeButtons[i] = *new TypeButton(location(20 + ColourButtons[9].getPosition().x + ColourButtons[9].getSize().width + (i * ButtonSize), 60), size(ButtonSize), window, (BrushType)i);
+        ColourArea->addChild(&(TypeButtons[i]));
+    }
+    inputImage = *new Image(inFileLocation);
+    ImageExists = true;
 }
 
 void CanvasWindow::Draw()
@@ -117,6 +151,10 @@ void CanvasWindow::Activate()
     log("canvas window drawn");
     log("canvas window event loop entered");
     Draw();
+    if (ImageExists)
+    {
+        inputImage.DrawImage(renderer, CanvasItem->getRect());
+    }
 
     while (!finished)
     {
