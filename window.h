@@ -38,12 +38,13 @@ protected:
     ResizableArea *ColourArea;
     ResizableArea *CanvasArea;
     Canvas *CanvasItem;
-    Image inputImage;
+    Image* inputImage;
     bool ImageExists;
+    Image* outputImage;
 
 public:
-    CanvasWindow(char *WindowName, int ButtonSize, size WindowSize);
-    CanvasWindow(char *WindowName, int ButtonSize, size WindowSize, char* inFileLocation);
+    CanvasWindow(char *WindowName, int ButtonSize, size WindowSize, char* outFileLocation);
+    CanvasWindow(char *WindowName, int ButtonSize, size WindowSize, char* inFileLocation, char* outFileLocation);
     void Activate();
     void Draw();
 };

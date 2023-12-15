@@ -31,40 +31,50 @@ int main(int argc, char *argv[])
     char windowname[18] = "Drawence Dellalio";
     size windowSize = size(800, 800);
     char *inputFile = "NULL";
+    char *outputFile = "NULL";
 
-    if (argc == 3)
+    for (int i = 1; i < argc; i++)
     {
-        if (!checkStringIsNum(argv[1]) || !checkStringIsNum(argv[2]))
+        if (!strcmp(argv[i], "-x") && windowSize.width == 800)
         {
-            windowSize = size(atoi(argv[1]), atoi(argv[2]));
+            windowSize.width = atoi(argv[i + 1]);
+        }
+        else if (!strcmp(argv[i], "-y") && windowSize.height == 800)
+        {
+            windowSize.height = atoi(argv[i + 1]);
+        }
+        else if (strcmp(argv[i], "-i") == 0)
+        {
+            inputFile = argv[i + 1];
+        }
+        else if (!strcmp(argv[i], "-o"))
+        {
+            outputFile = argv[i + 1];
+        }
+        else if (!strcmp(argv[i], "-useImageSize"))
+        {
+            windowSize = size(0, 0);
         }
     }
-    else if (argc == 2)
+    if (!strcmp(outputFile, "NULL"))
     {
-        inputFile = argv[1];
-        IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP);
+        outputFile = inputFile;
     }
-    else if (argc == 4)
+    if (!strcmp(outputFile, "NULL"))
     {
-        if (!checkStringIsNum(argv[1]) || !checkStringIsNum(argv[2]))
-        {
-            windowSize = size(atoi(argv[1]), atoi(argv[2]));
-        }
-        inputFile = argv[3];
-        IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP);
+        err("Output path unset. Please provide either an output path or an input path to overwrite.");
+        return 1;
     }
 
-
-    if (inputFile != "NULL")
+    if (strcmp(inputFile, "NULL"))
     {
-        log("image detected");
-        CanvasWindow mainWindow = *new CanvasWindow(windowname, 25, windowSize, inputFile);
+        CanvasWindow mainWindow = *new CanvasWindow(windowname, 25, windowSize, inputFile, outputFile);
         mainWindow.Activate();
         IMG_Quit();
     }
     else
     {
-        CanvasWindow mainWindow = *new CanvasWindow(windowname, 25, windowSize);
+        CanvasWindow mainWindow = *new CanvasWindow(windowname, 25, windowSize, outputFile);
         mainWindow.Activate();
     }
 

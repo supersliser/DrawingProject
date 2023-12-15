@@ -1,5 +1,6 @@
 #include "image.h"
 #include "log.h"
+#include "colour.h"
 
 char *Image::getFilename()
 {
@@ -15,6 +16,7 @@ char *Image::getFilename()
             return filename;
         }
     }
+    return "NULL";
 }
 
 char *Image::getFileLocation()
@@ -31,54 +33,90 @@ char *Image::getFileLocation()
             return path;
         }
     }
-}
-
-Image::Image()
-{
+    return "NULL";
 }
 Image::Image(char *inFileLocation)
 {
-    if (inFileLocation[sizeof(inFileLocation) / sizeof(char) - 3] == *"w" && inFileLocation[sizeof(inFileLocation) / sizeof(char) - 3] == *"e" && inFileLocation[sizeof(inFileLocation) / sizeof(char) - 2] == *"b" && inFileLocation[sizeof(inFileLocation) / sizeof(char) - 1] == *"p")
+    if (inFileLocation[strlen(inFileLocation) - 3] == *"w" && inFileLocation[strlen(inFileLocation) - 3] == *"e" && inFileLocation[strlen(inFileLocation) - 2] == *"b" && inFileLocation[strlen(inFileLocation) - 1] == *"p")
     {
         ext = WEBP;
     }
-    else if (inFileLocation[sizeof(inFileLocation) / sizeof(char) - 3] == *"p" && inFileLocation[sizeof(inFileLocation) / sizeof(char) - 2] == *"n" && inFileLocation[sizeof(inFileLocation) / sizeof(char) - 1] == *"g")
+    else if (inFileLocation[strlen(inFileLocation) - 3] == *"p" && inFileLocation[strlen(inFileLocation) - 2] == *"n" && inFileLocation[strlen(inFileLocation) - 1] == *"g")
     {
         ext = PNG;
     }
-    else if (inFileLocation[sizeof(inFileLocation) / sizeof(char) - 3] == *"j" && inFileLocation[sizeof(inFileLocation) / sizeof(char) - 2] == *"p" && inFileLocation[sizeof(inFileLocation) / sizeof(char) - 1] == *"g")
+    else if (inFileLocation[strlen(inFileLocation) - 3] == *"j" && inFileLocation[strlen(inFileLocation) - 2] == *"p" && inFileLocation[strlen(inFileLocation) - 1] == *"g")
     {
         ext = JPG;
     }
-    else if (inFileLocation[sizeof(inFileLocation) / sizeof(char) - 3] == *"b" && inFileLocation[sizeof(inFileLocation) / sizeof(char) - 2] == *"m" && inFileLocation[sizeof(inFileLocation) / sizeof(char) - 1] == *"b")
+    else if (inFileLocation[strlen(inFileLocation) - 3] == *"b" && inFileLocation[strlen(inFileLocation) - 2] == *"m" && inFileLocation[strlen(inFileLocation) - 1] == *"b")
     {
         ext = BMP;
     }
-    else if (inFileLocation[sizeof(inFileLocation) / sizeof(char) - 3] == *"t" && inFileLocation[sizeof(inFileLocation) / sizeof(char) - 2] == *"i" && inFileLocation[sizeof(inFileLocation) / sizeof(char) - 1] == *"f")
+    else if (inFileLocation[strlen(inFileLocation) - 3] == *"t" && inFileLocation[strlen(inFileLocation) - 2] == *"i" && inFileLocation[strlen(inFileLocation) - 1] == *"f")
     {
         ext = TIF;
     }
     fullPath = inFileLocation;
 }
 
-void Image::SaveImage(SDL_Window *window, SDL_Rect Canvas)
+void Image::SaveImage(SDL_Renderer *renderer, SDL_Rect Canvas)
 {
-    SDL_Surface *temp;
-    temp = SDL_GetWindowSurface(window);
-    SDL_SetClipRect(temp, &Canvas);
+    // SDL_Surface *temp = SDL_GetWindowSurface(window);
+    // SDL_SetClipRect(temp, &Canvas);
+    // // colour *pixels = (colour*)calloc(Canvas.w * Canvas.h, sizeof(pixels));
+    // // SDL_RenderReadPixels(renderer, &Canvas, SDL_PIXELFORMAT_RGB24, pixels, 0);
+    // // temp = SDL_CreateRGBSurfaceFrom(pixels, Canvas.w, Canvas.h, 0, 0, 0, 0, 0, 0);
+    // switch (ext)
+    // {
+    // case JPG:
+    // {
+    //     log("saving jpg");
+    //     IMG_SaveJPG(temp, fullPath, 100);
+    // }
+    // break;
+    // default:
+    // {
+    //     log("saving png");
+    //     IMG_SavePNG(temp, fullPath);
+    // }
+    // }
+    // log("image Saved");
+    // Create a temporary surface
+    SDL_Surface *sectionSurface = SDL_CreateRGBSurface(0, Canvas.w, Canvas.h, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
+
+    // Read pixels from the renderer
+    if (SDL_RenderReadPixels(renderer, &Canvas, SDL_PIXELFORMAT_RGBA8888, sectionSurface->pixels, sectionSurface->pitch) != 0)
+    {
+        log("Failed to read pixels from renderer");
+        return;
+    }
+
     switch (ext)
     {
     case JPG:
     {
-        IMG_SaveJPG(temp, fullPath, 100);
+        if (IMG_SaveJPG(sectionSurface, fullPath, 100) != 0)
+        {
+            log("Failed to save section as PNG image");
+            return;
+        }
     }
     break;
     default:
     {
-        IMG_SavePNG(temp, fullPath);
+        if (IMG_SavePNG(sectionSurface, fullPath) != 0)
+        {
+            log("Failed to save section as PNG image");
+            return;
+        }
     }
     }
-    log("image Saved");
+
+    // Save the section as a PNG image
+
+    // Free the temporary surface
+    SDL_FreeSurface(sectionSurface);
 }
 
 SDL_Surface *Image::getSurface()
@@ -108,4 +146,9 @@ void Image::DrawImage(SDL_Renderer *renderer, SDL_Rect Canvas)
 imageExtention Image::getExt()
 {
     return ext;
+}
+
+size Image::getImageSize()
+{
+    return size(getSurface()->w, getSurface()->h);
 }
