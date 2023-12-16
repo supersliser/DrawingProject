@@ -1,4 +1,3 @@
-#include <SDL2/SDL.h>
 #include "colour.h"
 
 Uint8 colour::convert(float in)
@@ -110,4 +109,64 @@ void Brush::Draw(SDL_Renderer *renderer, location lOne, location lTwo, int num, 
     {
         return;
     }
+}
+SDL_Rect *Square::getRect()
+{
+    SDL_Rect temp;
+    temp.x = x;
+    temp.y = y;
+    temp.w = w;
+    temp.h = h;
+    return &temp;
+}
+
+Square::Square()
+{
+}
+
+Square::Square(location Position, size inSize, colour inColour, int BrushSize)
+{
+    x = Position.x;
+    y = Position.y;
+    w = inSize.width;
+    h = inSize.height;
+
+    CurrentColour = inColour;
+    Square::BrushSize = BrushSize;
+}
+
+void Square::DrawTemp(SDL_Renderer *renderer, location MousePosition)
+{
+    w = MousePosition.x - x;
+    h = MousePosition.y - y;
+    SDL_SetRenderDrawColor(renderer, CurrentColour.r, CurrentColour.g, CurrentColour.b, 128);
+    SDL_RenderDrawRect(renderer, getRect());
+    SDL_RenderPresent(renderer);
+}
+
+void Square::Draw(SDL_Renderer *renderer)
+{
+    SDL_SetRenderDrawColor(renderer, CurrentColour.r, CurrentColour.g, CurrentColour.b, 255);
+    DrawR(renderer, BrushSize, *getRect());
+    SDL_RenderPresent(renderer);
+}
+
+void Square::DrawR(SDL_Renderer *renderer, int recurseCount, SDL_Rect rect)
+{
+    SDL_RenderDrawRect(renderer, &rect);
+
+    if (recurseCount == 0)
+    {
+        return;
+    }
+    SDL_Rect temp = rect;
+    temp.x -= 1;
+    DrawR(renderer, recurseCount - 1, temp);
+    temp.x += 2;
+    DrawR(renderer, recurseCount - 1, temp);
+    temp.x -=1;
+    temp.y -=1;
+    DrawR(renderer, recurseCount - 1, temp);
+    temp.y +=2;
+    DrawR(renderer, recurseCount - 1, temp);
 }

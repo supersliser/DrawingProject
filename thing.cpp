@@ -37,10 +37,12 @@ int main(int argc, char *argv[])
     {
         if (!strcmp(argv[i], "-x") && windowSize.width == 800)
         {
+            log("window width edited");
             windowSize.width = atoi(argv[i + 1]);
         }
         else if (!strcmp(argv[i], "-y") && windowSize.height == 800)
         {
+            log("window height edited");
             windowSize.height = atoi(argv[i + 1]);
         }
         else if (strcmp(argv[i], "-i") == 0)
@@ -51,7 +53,7 @@ int main(int argc, char *argv[])
         {
             outputFile = argv[i + 1];
         }
-        else if (!strcmp(argv[i], "-useImageSize"))
+        else if (!strcmp(argv[i], "-useImageSize") && strcmp(inputFile, "NULL"))
         {
             windowSize = size(0, 0);
         }

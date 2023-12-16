@@ -8,6 +8,7 @@ class Button : public Area
 
 public:
     void Click();
+    void Draw(SDL_Renderer *renderer);
 };
 
 class ColourButton : public Button
@@ -27,6 +28,7 @@ public:
     SizeButton(location inPosition, size inSize, colour inBC, SDL_Window *window, int SizeItem);
 
     void Click(int *CurrentSize);
+    void Draw(SDL_Renderer *renderer);
 };
 
 class TypeButton : public Button

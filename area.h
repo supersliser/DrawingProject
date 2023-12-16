@@ -1,6 +1,7 @@
 #pragma once
 #include "location.h"
 #include "colour.h"
+#include <SDL2/SDL_image.h>
 class Area
 {
 protected:
@@ -32,7 +33,7 @@ public:
     colour getBackColour();
     colour getBorderColour();
     void Draw(SDL_Renderer *renderer);
-    SDL_Rect* getRect();
+    SDL_Rect *getRect();
 };
 
 class ResizableArea : public Area

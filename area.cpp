@@ -137,7 +137,7 @@ void Area::Draw(SDL_Renderer *renderer)
 	}
 }
 
-SDL_Rect* Area::getRect()
+SDL_Rect *Area::getRect()
 {
 	SDL_Rect output;
 	output.x = getPosition().x;

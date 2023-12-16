@@ -29,7 +29,8 @@
     "__mutex_base": "cpp",
     "__node_handle": "cpp",
     "__tuple": "cpp",
-    "queue": "cpp"
+    "queue": "cpp",
+    "__config": "cpp"
   },
   "C_Cpp_Runner.msvcBatchPath": "",
   "C_Cpp_Runner.cCompilerPath": "gcc",

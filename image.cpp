@@ -60,36 +60,14 @@ Image::Image(char *inFileLocation)
     fullPath = inFileLocation;
 }
 
-void Image::SaveImage(SDL_Renderer *renderer, SDL_Rect Canvas)
+SDL_Surface *Image::SaveImage(SDL_Renderer *renderer, SDL_Rect Canvas)
 {
-    // SDL_Surface *temp = SDL_GetWindowSurface(window);
-    // SDL_SetClipRect(temp, &Canvas);
-    // // colour *pixels = (colour*)calloc(Canvas.w * Canvas.h, sizeof(pixels));
-    // // SDL_RenderReadPixels(renderer, &Canvas, SDL_PIXELFORMAT_RGB24, pixels, 0);
-    // // temp = SDL_CreateRGBSurfaceFrom(pixels, Canvas.w, Canvas.h, 0, 0, 0, 0, 0, 0);
-    // switch (ext)
-    // {
-    // case JPG:
-    // {
-    //     log("saving jpg");
-    //     IMG_SaveJPG(temp, fullPath, 100);
-    // }
-    // break;
-    // default:
-    // {
-    //     log("saving png");
-    //     IMG_SavePNG(temp, fullPath);
-    // }
-    // }
-    // log("image Saved");
-    // Create a temporary surface
     SDL_Surface *sectionSurface = SDL_CreateRGBSurface(0, Canvas.w, Canvas.h, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
 
-    // Read pixels from the renderer
     if (SDL_RenderReadPixels(renderer, &Canvas, SDL_PIXELFORMAT_RGBA8888, sectionSurface->pixels, sectionSurface->pitch) != 0)
     {
         log("Failed to read pixels from renderer");
-        return;
+        return NULL;
     }
 
     switch (ext)
@@ -99,7 +77,7 @@ void Image::SaveImage(SDL_Renderer *renderer, SDL_Rect Canvas)
         if (IMG_SaveJPG(sectionSurface, fullPath, 100) != 0)
         {
             log("Failed to save section as PNG image");
-            return;
+            return NULL;
         }
     }
     break;
@@ -108,15 +86,11 @@ void Image::SaveImage(SDL_Renderer *renderer, SDL_Rect Canvas)
         if (IMG_SavePNG(sectionSurface, fullPath) != 0)
         {
             log("Failed to save section as PNG image");
-            return;
+            return NULL;
         }
     }
     }
-
-    // Save the section as a PNG image
-
-    // Free the temporary surface
-    SDL_FreeSurface(sectionSurface);
+    return sectionSurface;
 }
 
 SDL_Surface *Image::getSurface()
