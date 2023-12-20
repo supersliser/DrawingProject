@@ -155,9 +155,9 @@ void CanvasWindow::Draw()
     if (ImageExists)
     {
         inputImage->DrawImage(renderer, *(CanvasItem->getRect()));
-        SDL_RenderPresent(renderer);
     }
     SDL_RenderPresent(renderer);
+    log("resised");
 }
 
 void CanvasWindow::Activate()
@@ -280,8 +280,12 @@ void CanvasWindow::Activate()
                 }
                 else if (*(CanvasItem->getBrushType()) == CircleShape && drawing)
                 {
+                    SDL_RenderCopy(renderer, TempDrawing, NULL, CanvasItem->getRect());
                     circleBrush.Draw(renderer, *CanvasItem->getRect());
                     SDL_DestroyTexture(TempDrawing);
+                    location Center = circleBrush.getCenter();
+                    int radius = circleBrush.getRadius();
+                    CanvasItem->Fill(renderer, window, location(Center.x + radius, Center.y));
                 }
                 drawing = 0;
             }

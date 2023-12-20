@@ -75,4 +75,6 @@ public:
     Circle(location inCenter, int inRadius, colour inColour, int BrushSize);
     void DrawTemp(SDL_Renderer *renderer, location MouseDistance, SDL_Rect CanvasSize);
     void Draw(SDL_Renderer *renderer, SDL_Rect CanvasSize);
+    location getCenter();
+    int getRadius();
 };

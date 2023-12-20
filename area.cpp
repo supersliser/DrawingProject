@@ -247,12 +247,8 @@ colour Canvas::getPixelColour(SDL_Renderer *renderer, int x, int y)
 	pcol.r = 255;
 	pcol.g = 255;
 	pcol.b = 255;
-	printf("size x= %d y= %d\n", width, height);
-	printf("positon x= %d y= %d\n", x, y);
-	fflush(stdout);
 	if (x >= 0 && x < Size.width + getPosition().x && y >= 0 && y < Size.height + getPosition().y) /* test if the coordinates are valid */
 	{
-		log("true");
 		SDL_Rect rect; /* SDL rectangle of 1 pixel */
 		/* 2 helper structures to get SDL to generate the right pixel format */
 		SDL_Surface *s = SDL_CreateRGBSurface(0, 5, 5, 32, 0, 0, 0, 0);				/* helper 1 */
@@ -276,30 +272,21 @@ void Canvas::Fill(SDL_Renderer *renderer, SDL_Window *window, location mouseLoca
 {
 	SDL_SetRenderDrawColor(renderer, BrushItem.CurrentColour.r, BrushItem.CurrentColour.g, BrushItem.CurrentColour.b, 255);
 	Fillr(renderer, mouseLocation, getPixelColour(renderer, mouseLocation.x, mouseLocation.y));
-	log("Fill Completed");
 }
 
 void Canvas::Fillr(SDL_Renderer *renderer, location PointLocation, colour sourceColour)
 {
 	colour pcol = getPixelColour(renderer, PointLocation.x, PointLocation.y);
-	printf("Canvas PointLocation x= %d, y= %d\n", PointLocation.x - getPosition().x, PointLocation.y - getPosition().y);
-	printf("Canvas Size x= %d y= %d\n", Size.width, Size.height);
-	printf("Canvas Colour %d %d %d\n", pcol.r, pcol.g, pcol.b);
-	printf("Source Colour %d %d %d\n", sourceColour.r, sourceColour.g, sourceColour.b);
-	fflush(stdout);
 	if (PointLocation.x < getPosition().x || PointLocation.y < getPosition().y || PointLocation.x > Size.width + getPosition().x || PointLocation.y > Size.height + getPosition().y)
 	{
-		log("Boundary Reached");
 		return;
 	}
 	if (pcol.r != sourceColour.r || pcol.g != sourceColour.g || pcol.b != sourceColour.b)
 	{
-		log("Colour Boundary Reached");
 		return;
 	}
 	if (sourceColour.r == BrushItem.CurrentColour.r && sourceColour.g == BrushItem.CurrentColour.g && sourceColour.b == BrushItem.CurrentColour.b)
 	{
-		log("Colour Boundary Also reached");
 		return;
 	}
 	SDL_RenderDrawPoint(renderer, PointLocation.x, PointLocation.y);
