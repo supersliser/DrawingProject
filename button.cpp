@@ -98,7 +98,12 @@ void TypeButton::Draw(SDL_Renderer *renderer)
     {
         Button::Draw(renderer);
         Circle temp = Circle(location(Position.x + (Size.width / 2), Position.y + (Size.height / 2)), 10, black, 1);
-        temp.Draw(renderer);
+        SDL_Rect tempRect;
+        tempRect.x = Position.x;
+        tempRect.y = Position.y;
+        tempRect.w = Size.width;
+        tempRect.h = Size.height;
+        temp.Draw(renderer, tempRect);
     }
     default:
         Button::Draw(renderer);

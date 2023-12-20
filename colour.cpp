@@ -139,7 +139,7 @@ void Square::DrawTemp(SDL_Renderer *renderer, location MousePosition)
 {
     w = MousePosition.x - x;
     h = MousePosition.y - y;
-    SDL_SetRenderDrawColor(renderer, CurrentColour.r, CurrentColour.g, CurrentColour.b, 128);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     SDL_RenderDrawRect(renderer, getRect());
     SDL_RenderPresent(renderer);
 }
@@ -182,40 +182,63 @@ Circle::Circle(location inCenter, int inRadius, colour inColour, int BrushSize)
     Brush::BrushSize = BrushSize;
 }
 
-void Circle::DrawCircle(SDL_Renderer *renderer)
+void Circle::DrawCircle(SDL_Renderer *renderer, SDL_Rect CanvasSize)
 {
+    // int x = radius, y = 0, error = 1 - radius;
+    // while (x >= y)
+    // {
+    //     SDL_RenderDrawLine(renderer)                /* 1 draw call for each octant */
+    //     draw(x + x0, y + y0);   /* octant 1 */
+    //     draw(y + x0, x + y0);   /* octant 2 */
+    //     draw(-x + x0, y + y0);  /* octant 3 */
+    //     draw(-y + x0, x + y0);  /* octant 4 */
+    //     draw(-x + x0, -y + y0); /* octant 5 */
+    //     draw(-y + x0, -x + y0); /* octant 6 */
+    //     draw(x + x0, -y + y0);  /* octant 7 */
+    //     draw(y + x0, -x + y0);  /* octant 8 */
+    //     y++;                    /* increment y coordinate */
+    //     if (error < 0)
+    //     {
+    //         error += 2 * y + 1;
+    //     }
+    //     else
+    //     {
+    //         x--;
+    //         error += 2 * (y - x) + 1;
+    //     }
+    // }
     int x = radius;
     int y = 0;
+    int x0 = Center.x;
+    int y0 = Center.y;
     int error = 1 - radius;
-
     while (x >= y)
     {
-        /* 1 draw call for each octant - ensure coordinates are valid before drawing */
-        if ((x + Center.x) >= 0 && (x + Center.x) < width && (y + Center.y) >= 0 && (y + Center.y) < height)
-            SDL_RenderDrawPoint(renderer, x + Center.x, y + Center.y);
-        /* draw point in octant 1 if coordinate is valid */
-        if ((y + Center.x) >= 0 && (y + Center.x) < width && (x + Center.y) >= 0 && (x + Center.y) < height)
-            SDL_RenderDrawPoint(renderer, y + Center.x, x + Center.y);
-        /* draw point in octant 2 if coordinate is valid */
-        if ((-x + Center.x) >= 0 && (-x + Center.x) < width && (y + Center.y) >= 0 && (y + Center.y) < height)
-            SDL_RenderDrawPoint(renderer, -x + Center.x, y + Center.y);
-        /* draw point in octant 3 if coordinate is valid */
-        if ((-y + Center.x) >= 0 && (-y + Center.x) < width && (x + Center.y) >= 0 && (x + Center.y) < height)
-            SDL_RenderDrawPoint(renderer, -y + Center.x, x + Center.y);
-        /* draw point in octant 4 if coordinate is valid */
-        if ((-x + Center.x) >= 0 && (-x + Center.x) < width && (-y + Center.y) >= 0 && (-y + Center.y) < height)
-            SDL_RenderDrawPoint(renderer, -x + Center.x, -y + Center.y);
-        /* draw point in octant 5 if coordinate is valid */
-        if ((-y + Center.x) >= 0 && (-y + Center.x) < width && (-x + Center.y) >= 0 && (-x + Center.y) < height)
-            SDL_RenderDrawPoint(renderer, -y + Center.x, -x + Center.y);
-        /* draw point in octant 6 if coordinate is valid */
-        if ((x + Center.x) >= 0 && (x + Center.x) < width && (-y + Center.y) >= 0 && (-y + Center.y) < height)
-            SDL_RenderDrawPoint(renderer, x + Center.x, -y + Center.y);
-        /* draw point in octant 7 if coordinate is valid */
-        if ((y + Center.x) >= 0 && (y + Center.x) < width && (-x + Center.y) >= 0 && (-x + Center.y) < height)
-            SDL_RenderDrawPoint(renderer, y + Center.x, -x + Center.y);
-        /* draw point in octant 8 if coordinate is valid */
-        y++; /* increment y coordinate */
+        if (x + x0 > CanvasSize.x || x + x0 < CanvasSize.w || y + y0 > CanvasSize.y || y + y0 < CanvasSize.y)
+            SDL_RenderDrawPoint(renderer, x + x0, y + y0);
+
+        if (y + x0 > CanvasSize.x || y + x0 < CanvasSize.w || x + y0 > CanvasSize.y || x + y0 < CanvasSize.y)
+            SDL_RenderDrawPoint(renderer, y + x0, x + y0);
+
+        if (-y + x0 > CanvasSize.x || -y + x0 < CanvasSize.w || x + y0 > CanvasSize.y || x + y0 < CanvasSize.y)
+            SDL_RenderDrawPoint(renderer, -y + x0, x + y0);
+
+        if (-x + x0 > CanvasSize.x || -x + x0 < CanvasSize.w || y + y0 > CanvasSize.y || y + y0 < CanvasSize.y)
+            SDL_RenderDrawPoint(renderer, -x + x0, y + y0);
+
+        if (-x + x0 > CanvasSize.x || -x + x0 < CanvasSize.w || -y + y0 > CanvasSize.y || -y + y0 < CanvasSize.y)
+            SDL_RenderDrawPoint(renderer, -x + x0, -y + y0);
+
+        if (-y + x0 > CanvasSize.x || -y + x0 < CanvasSize.w || -x + y0 > CanvasSize.y || -x + y0 < CanvasSize.y)
+            SDL_RenderDrawPoint(renderer, -y + x0, -x + y0);
+
+        if (y + x0 > CanvasSize.x || y + x0 < CanvasSize.w || -x + y0 > CanvasSize.y || -x + y0 < CanvasSize.y)
+            SDL_RenderDrawPoint(renderer, y + x0, -x + y0);
+
+        if (x + x0 > CanvasSize.x || x + x0 < CanvasSize.w || -y + y0 > CanvasSize.y || -y + y0 < CanvasSize.y)
+            SDL_RenderDrawPoint(renderer, x + x0, -y + y0);
+
+        y++;
         if (error < 0)
         {
             error += 2 * y + 1;
@@ -226,36 +249,60 @@ void Circle::DrawCircle(SDL_Renderer *renderer)
             error += 2 * (y - x) + 1;
         }
     }
+    // SDL_RenderDrawLine(renderer,
+    //                    x + x0, y + y0,
+    //                    y + x0, x + y0);
+    // SDL_RenderDrawLine(renderer,
+    //                    y + x0, x + y0,
+    //                    -y + x0, x + y0);
+    // SDL_RenderDrawLine(renderer,
+    //                    -y + x0, x + y0,
+    //                    -x + x0, y + y0);
+    // SDL_RenderDrawLine(renderer,
+    //                    -x + x0, y + y0,
+    //                    -x + x0, -y + y0);
+    // SDL_RenderDrawLine(renderer,
+    //                    -x + x0, -y + y0,
+    //                    -y + x0, -x + y0);
+    // SDL_RenderDrawLine(renderer,
+    //                    -y + x0, -x + y0,
+    //                    y + x0, -x + y0);
+    // SDL_RenderDrawLine(renderer,
+    //                    y + x0, -x + y0,
+    //                    x + x0, -y + y0);
+    // SDL_RenderDrawLine(renderer,
+    //                    x + x0, -y + y0,
+    //                    x + x0, y + y0);
+    // SDL_RenderDrawLine(renderer, Center.x + radius, Center.y,
+    //                    Center.y + radius, Center.x);
+    // SDL_RenderDrawLine(renderer, Center.y + radius, Center.x,
+    //                    -Center.x + radius, Center.y);
+    // SDL_RenderDrawLine(renderer, -Center.x + radius, Center.y,
+    //                    -Center.y + radius, Center.x);
+    // SDL_RenderDrawLine(renderer, -Center.y + radius, Center.x,
+    //                    -Center.x + radius, -Center.y);
+    // SDL_RenderDrawLine(renderer, -Center.x + radius, -Center.y,
+    //                    -Center.y + radius, -Center.x);
+    // SDL_RenderDrawLine(renderer, -Center.y + radius, -Center.x,
+    //                    Center.x + radius, -Center.y);
+    // SDL_RenderDrawLine(renderer, Center.x + radius, -Center.y,
+    //                    Center.y + radius, -Center.x);
+    // SDL_RenderDrawLine(renderer, Center.y + radius, -Center.x,
+    //                    Center.x + radius, Center.y);
+    log("circle Drawn");
 }
 
-void Circle::DrawTemp(SDL_Renderer *renderer, location MousePosition)
+void Circle::DrawTemp(SDL_Renderer *renderer, location MouseDistance, SDL_Rect CanvasSize)
 {
-    if (MousePosition.x < Center.x)
-    {
-        radius = Center.x - MousePosition.x;
-    }
-    else
-    {
-        radius = MousePosition.x - Center.x;
-    }
-    if (MousePosition.y < Center.y)
-    {
-        radius += Center.y - MousePosition.y;
-    }
-    else
-    {
-        radius = MousePosition.y - Center.y;
-    }
+    radius = MouseDistance.x - Center.x;
+    radius += MouseDistance.y - Center.y;
 
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    DrawCircle(renderer);
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    DrawCircle(renderer, CanvasSize);
 }
 
-void Circle::Draw(SDL_Renderer* renderer)
+void Circle::Draw(SDL_Renderer *renderer, SDL_Rect CanvasSize)
 {
     SDL_SetRenderDrawColor(renderer, CurrentColour.r, CurrentColour.g, CurrentColour.b, 255);
-    radius += BrushSize / 2;
-    DrawCircle(renderer);
-    radius -= BrushSize;
-    DrawCircle(renderer);
+    DrawCircle(renderer, CanvasSize);
 }

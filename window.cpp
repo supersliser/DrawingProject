@@ -167,12 +167,8 @@ void CanvasWindow::Activate()
     bool drawing = 0;
     bool ctrl = false;
     Square squareBrush;
+    Circle circleBrush;
     SDL_Texture *TempDrawing;
-    SDL_Rect PreviousRect;
-    PreviousRect.x = 0;
-    PreviousRect.y = 0;
-    PreviousRect.w = 0;
-    PreviousRect.h = 0;
     Draw();
 
     while (!finished)
@@ -261,11 +257,15 @@ void CanvasWindow::Activate()
                     }
                     else if (*(CanvasItem->getBrushType()) == SquareShape)
                     {
-                        Image tempImage = *new Image("./tempSurface");
+                        Image tempImage = *new Image("./tempSurface.png");
                         TempDrawing = SDL_CreateTextureFromSurface(renderer, tempImage.SaveImage(renderer, *(CanvasItem->getRect())));
                         squareBrush = *new Square(location(event.button.x, event.button.y), size(0, 0), *(CanvasItem->getCurrentColour()), *(CanvasItem->getBrushSize()));
-                        PreviousRect.x = event.button.x;
-                        PreviousRect.y = event.button.y;
+                    }
+                    else if (*CanvasItem->getBrushType() == CircleShape)
+                    {
+                        Image tempImage = *new Image("./tempSurface.png");
+                        TempDrawing = SDL_CreateTextureFromSurface(renderer, tempImage.SaveImage(renderer, *(CanvasItem->getRect())));
+                        circleBrush = *new Circle(location(event.button.x, event.button.y), 0, *(CanvasItem->getCurrentColour()), *(CanvasItem->getBrushSize()));
                     }
                 }
             }
@@ -276,10 +276,11 @@ void CanvasWindow::Activate()
                 if (*(CanvasItem->getBrushType()) == SquareShape && drawing)
                 {
                     squareBrush.Draw(renderer);
-                    PreviousRect.x = 0;
-                    PreviousRect.y = 0;
-                    PreviousRect.w = 0;
-                    PreviousRect.h = 0;
+                    SDL_DestroyTexture(TempDrawing);
+                }
+                else if (*(CanvasItem->getBrushType()) == CircleShape && drawing)
+                {
+                    circleBrush.Draw(renderer, *CanvasItem->getRect());
                     SDL_DestroyTexture(TempDrawing);
                 }
                 drawing = 0;
@@ -293,19 +294,25 @@ void CanvasWindow::Activate()
                     if (event.button.y >= (*CanvasItem).getPosition().y && event.button.y <= (*CanvasItem).getPosition().y + (*CanvasItem).getSize().height && event.button.x >= (*CanvasItem).getPosition().x && event.button.x <= (*CanvasItem).getPosition().x + (*CanvasItem).getSize().width)
                     {
                         CanvasItem->BrushDraw(renderer, location(event.button.x - event.motion.xrel - 1, event.button.y - event.motion.yrel), location(event.button.x - 1, event.button.y));
-                        SDL_RenderPresent(renderer);
                     }
                 }
                 else if (drawing && *(CanvasItem->getBrushType()) == SquareShape)
                 {
                     if (event.button.y >= (*CanvasItem).getPosition().y && event.button.y <= (*CanvasItem).getPosition().y + (*CanvasItem).getSize().height && event.button.x >= (*CanvasItem).getPosition().x && event.button.x <= (*CanvasItem).getPosition().x + (*CanvasItem).getSize().width)
                     {
-                        PreviousRect.w = event.button.x - PreviousRect.x;
-                        PreviousRect.h = event.button.y - PreviousRect.y;
                         SDL_RenderCopy(renderer, TempDrawing, NULL, CanvasItem->getRect());
                         squareBrush.DrawTemp(renderer, location(event.button.x, event.button.y));
                     }
                 }
+                else if (drawing && *(CanvasItem->getBrushType()) == CircleShape)
+                {
+                    if (event.button.y >= (*CanvasItem).getPosition().y && event.button.y <= (*CanvasItem).getPosition().y + (*CanvasItem).getSize().height && event.button.x >= (*CanvasItem).getPosition().x && event.button.x <= (*CanvasItem).getPosition().x + (*CanvasItem).getSize().width)
+                    {
+                        SDL_RenderCopy(renderer, TempDrawing, NULL, CanvasItem->getRect());
+                        circleBrush.DrawTemp(renderer, location(event.button.x, event.button.y), *CanvasItem->getRect());
+                    }
+                }
+                SDL_RenderPresent(renderer);
             }
             break;
             }

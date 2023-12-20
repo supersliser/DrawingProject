@@ -68,11 +68,11 @@ protected:
     location Center;
     int radius;
 
-    void DrawCircle(SDL_Renderer *renderer);
+    void DrawCircle(SDL_Renderer *renderer, SDL_Rect CanvasSize);
 
 public:
     Circle();
     Circle(location inCenter, int inRadius, colour inColour, int BrushSize);
-    void DrawTemp(SDL_Renderer *renderer, location MousePosition);
-    void Draw(SDL_Renderer *renderer);
+    void DrawTemp(SDL_Renderer *renderer, location MouseDistance, SDL_Rect CanvasSize);
+    void Draw(SDL_Renderer *renderer, SDL_Rect CanvasSize);
 };
