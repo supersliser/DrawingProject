@@ -34,7 +34,7 @@ class CanvasWindow : public Window
 protected:
     ColourButton ColourButtons[10];
     SizeButton SizeButtons[4];
-    TypeButton TypeButtons[3];
+    TypeButton TypeButtons[4];
     ResizableArea *ColourArea;
     ResizableArea *CanvasArea;
     Canvas *CanvasItem;

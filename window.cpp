@@ -300,8 +300,6 @@ void CanvasWindow::Activate()
                 {
                     if (event.button.y >= (*CanvasItem).getPosition().y && event.button.y <= (*CanvasItem).getPosition().y + (*CanvasItem).getSize().height && event.button.x >= (*CanvasItem).getPosition().x && event.button.x <= (*CanvasItem).getPosition().x + (*CanvasItem).getSize().width)
                     {
-                        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-                        SDL_RenderDrawRect(renderer, &PreviousRect);
                         PreviousRect.w = event.button.x - PreviousRect.x;
                         PreviousRect.h = event.button.y - PreviousRect.y;
                         SDL_RenderCopy(renderer, TempDrawing, NULL, CanvasItem->getRect());

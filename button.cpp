@@ -94,6 +94,12 @@ void TypeButton::Draw(SDL_Renderer *renderer)
         SDL_RenderDrawRect(renderer, &temp);
     }
     break;
+    case CircleShape:
+    {
+        Button::Draw(renderer);
+        Circle temp = Circle(location(Position.x + (Size.width / 2), Position.y + (Size.height / 2)), 10, black, 1);
+        temp.Draw(renderer);
+    }
     default:
         Button::Draw(renderer);
         break;

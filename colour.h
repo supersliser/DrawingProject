@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL2/SDL.h>
 #include "location.h"
+#include "log.h"
 
 enum defaultColours
 {
@@ -20,7 +21,8 @@ enum BrushType
 {
     Basic = 0,
     Fill,
-    SquareShape
+    SquareShape,
+    CircleShape
 };
 
 class colour
@@ -52,9 +54,25 @@ class Square : Brush, SDL_Rect
 protected:
     SDL_Rect *getRect();
     void DrawR(SDL_Renderer *renderer, int recurseCount, SDL_Rect rect);
+
 public:
     Square();
     Square(location Position, size inSize, colour inColour, int BrushSize);
+    void DrawTemp(SDL_Renderer *renderer, location MousePosition);
+    void Draw(SDL_Renderer *renderer);
+};
+
+class Circle : Brush
+{
+protected:
+    location Center;
+    int radius;
+
+    void DrawCircle(SDL_Renderer *renderer);
+
+public:
+    Circle();
+    Circle(location inCenter, int inRadius, colour inColour, int BrushSize);
     void DrawTemp(SDL_Renderer *renderer, location MousePosition);
     void Draw(SDL_Renderer *renderer);
 };
