@@ -60,14 +60,18 @@ Image::Image(char *inFileLocation)
     fullPath = inFileLocation;
 }
 
-SDL_Surface *Image::SaveImage(SDL_Renderer *renderer, SDL_Rect Canvas)
+Image::Image()
+{
+}
+
+void Image::SaveImage(SDL_Renderer *renderer, SDL_Rect Canvas)
 {
     SDL_Surface *sectionSurface = SDL_CreateRGBSurface(0, Canvas.w, Canvas.h, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
 
     if (SDL_RenderReadPixels(renderer, &Canvas, SDL_PIXELFORMAT_RGBA8888, sectionSurface->pixels, sectionSurface->pitch) != 0)
     {
         log("Failed to read pixels from renderer");
-        return NULL;
+        return;
     }
 
     switch (ext)
@@ -77,7 +81,7 @@ SDL_Surface *Image::SaveImage(SDL_Renderer *renderer, SDL_Rect Canvas)
         if (IMG_SaveJPG(sectionSurface, fullPath, 100) != 0)
         {
             log("Failed to save section as PNG image");
-            return NULL;
+            return;
         }
     }
     break;
@@ -86,11 +90,10 @@ SDL_Surface *Image::SaveImage(SDL_Renderer *renderer, SDL_Rect Canvas)
         if (IMG_SavePNG(sectionSurface, fullPath) != 0)
         {
             log("Failed to save section as PNG image");
-            return NULL;
+            return;
         }
     }
     }
-    return sectionSurface;
 }
 
 SDL_Surface *Image::getSurface()

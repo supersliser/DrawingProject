@@ -21,11 +21,12 @@ protected:
     SDL_Surface *ImageData = nullptr;
 
 public:
+    Image();
     imageExtention getExt();
     Image(char *inFileLocation);
     SDL_Surface *getSurface();
     SDL_Texture *getTexture(SDL_Renderer *renderer);
     void DrawImage(SDL_Renderer *renderer, SDL_Rect Canvas);
-    SDL_Surface *SaveImage(SDL_Renderer *renderer, SDL_Rect Canvas);
+    void SaveImage(SDL_Renderer *renderer, SDL_Rect Canvas);
     size getImageSize();
 };

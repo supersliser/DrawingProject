@@ -246,8 +246,22 @@ void Circle::DrawCircle(SDL_Renderer *renderer, SDL_Rect CanvasSize)
 
 void Circle::DrawTemp(SDL_Renderer *renderer, location MouseDistance, SDL_Rect CanvasSize)
 {
-    radius = MouseDistance.x - Center.x;
-    radius += MouseDistance.y - Center.y;
+    if (MouseDistance.x - Center.x < 0)
+    {
+        radius = -1 * (MouseDistance.x - Center.x);
+    }
+    else
+    {
+        radius = MouseDistance.x - Center.x;
+    }
+    if (MouseDistance.y - Center.y < 0)
+    {
+        radius += -1 * (MouseDistance.y - Center.y);
+    }
+    else
+    {
+        radius += MouseDistance.y - Center.y;
+    }
 
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     DrawCircle(renderer, CanvasSize);
