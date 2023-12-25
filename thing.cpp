@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     {
         printf("error: %s \n", SDL_GetError());
     }
-    char windowname[18] = "Drawence Dellalio";
+    char windowname[8] = "TLPaint";
     size windowSize = size(800, 800);
     char *inputFile = "NULL";
     char *outputFile = "NULL";
