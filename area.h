@@ -2,39 +2,54 @@
 #include "location.h"
 #include "colour.h"
 #include <SDL2/SDL_image.h>
+
+// A resizable square shaped area
 class Area
 {
 protected:
+    // The location of the top left corner relative to the position of the parent area
     location Position;
+    // The size of the area
     size Size;
+    // The background colour of the area
     colour BackColour;
-    colour ForeColour;
+    // The colour of the border of the area
     colour BorderColour;
-    //    int borderWidth;
+    // An array of children areas
     Area **children = nullptr;
+    // The number of children
     int childCount = 0;
+    // The parent area of this area.
     Area *parent = nullptr;
 
 public:
+    // Constructors
     Area();
     Area(location inPosition, size inSize, SDL_Window *window);
     Area(location inPosition, size inSize, colour inBC, SDL_Window *window);
     Area(location inPosition, size inSize, colour inBC, colour inBorderC, SDL_Window *window);
+    // Setters
     void setPosition(location in);
     void setSize(size in);
     void setBackColour(colour in);
     void setBorderColour(colour in);
     void setParent(Area *inParent);
+    // Adds a pointer to a child area
     void addChild(Area *inArea);
+    // Removes a pointer to a child area
     void killChild(int index);
+    // Gets the child at a given index
     Area *getChild(int index);
+    // Getters
     location getPosition();
     size getSize();
     colour getBackColour();
     colour getBorderColour();
-    void Draw(SDL_Renderer *renderer);
     SDL_Rect *getRect();
+    // Draws the area by drawing the background area, then drawing all child components
+    void Draw(SDL_Renderer *renderer);
 };
+
 
 class ResizableArea : public Area
 {
