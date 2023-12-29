@@ -10,6 +10,7 @@
 #include <SDL2/SDL_image.h>
 #include "log.h"
 
+// checks whether a given string is numeric
 bool checkStringIsNum(char *in)
 {
     for (int i = 0; i < sizeof(in) / sizeof(char); i++)
@@ -22,17 +23,21 @@ bool checkStringIsNum(char *in)
     return true;
 }
 
+// program entrypoint
 int main(int argc, char *argv[])
 {
+    // intitialises all of SDL
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
         printf("error: %s \n", SDL_GetError());
     }
+    // Default values
     char windowname[8] = "TLPaint";
     size windowSize = size(800, 800);
     char *inputFile = "NULL";
     char *outputFile = "NULL";
 
+    // checks for arguements
     for (int i = 1; i < argc; i++)
     {
         if (!strcmp(argv[i], "-x") && windowSize.width == 800)
@@ -68,6 +73,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    // intialises the main window with a default image if it is specified
     if (strcmp(inputFile, "NULL"))
     {
         CanvasWindow mainWindow = *new CanvasWindow(windowname, 25, windowSize, inputFile, outputFile);
@@ -80,6 +86,7 @@ int main(int argc, char *argv[])
         mainWindow.Activate();
     }
 
+    // once the window is exited, sdl should quit
     SDL_Quit();
     return 0;
 }

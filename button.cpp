@@ -29,6 +29,7 @@ SizeButton::SizeButton(location inPosition, size inSize, colour inBC, SDL_Window
 
 void SizeButton::Draw(SDL_Renderer *renderer)
 {
+    //draws a single point with the brush on top of the background colour
     Button::Draw(renderer);
     Brush temp = *new Brush();
     temp.CurrentColour = black;
@@ -60,6 +61,7 @@ void TypeButton::Click(BrushType *inType)
 
 void TypeButton::Draw(SDL_Renderer *renderer)
 {
+    //Draws a sample version of the type of brush 
     switch (Type)
     {
     case Fill:
@@ -97,7 +99,7 @@ void TypeButton::Draw(SDL_Renderer *renderer)
     case CircleShape:
     {
         Button::Draw(renderer);
-        Circle temp = Circle(location(Position.x + (Size.width / 2), Position.y + (Size.height / 2)), 10, black, 1);
+        Circle temp = Circle(location(Position.x + (Size.width / 2), Position.y + (Size.height / 2)), 5, black, 1);
         SDL_Rect tempRect;
         tempRect.x = Position.x;
         tempRect.y = Position.y;

@@ -50,38 +50,30 @@ public:
     void Draw(SDL_Renderer *renderer);
 };
 
-
-class ResizableArea : public Area
-{
-    using Area::Area;
-
-public:
-    ResizableArea(location inPosition, size inSize, colour inBC, colour inBorderC, int inBW, SizeLock inLock, SDL_Window *window);
-    ResizableArea(location inPosition, size inSize, colour inBC, colour inBorderC, int inBW, SizeLock inLock, Area *Parent, SDL_Window *window);
-    void Draw(SDL_Renderer *renderer, SDL_Window *window);
-    SDL_Surface *drawing;
-
-protected:
-    SizeLock lock = SizeLock::none;
-    margin Margin;
-};
-
+// A type of Area that can be drawn upon
 class Canvas : public Area
 {
     using Area::Area;
 
 protected:
+    // The brush being used to draw
     Brush BrushItem;
+    // The Recursive algorithm used to run the fill command
     void Fillr(SDL_Renderer *renderer, location PointLocation, colour sourceColour);
 
 public:
+    // Gets the colour at the specified pixel
     colour getPixelColour(SDL_Renderer *renderer, int x, int y);
-
-    void fill(SDL_Renderer *renderer, int wdth, int hght, int x, int y, colour src, colour dst);
+    // Canvas Constructor
     Canvas(Area *inParent);
+    // Gets a pointer to the current colour of the Brush
     colour *getCurrentColour();
+    // Gets a pointer to the current type of Brush set
     BrushType *getBrushType();
+    // Gets a pointer to the current size of the Brush
     int *getBrushSize();
+    // Initiates the recursive fill
     void Fill(SDL_Renderer *renderer, SDL_Window *window, location mouseLocation);
+    // Draws to the canvas with the given brush
     void BrushDraw(SDL_Renderer *renderer, location lOne, location lTwo);
 };

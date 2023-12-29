@@ -20,11 +20,14 @@ Window::Window(char *WindowName, size Size)
 }
 void Window::CreateWindow(char *Name, location Position, size Size, colour InitialColour, Uint32 Flags)
 {
+    // creates a window
     SDL_Window *temp = SDL_CreateWindow(Name, Position.x, Position.y, Size.width, Size.height, Flags);
     window = temp;
+    // creates a renderer
     SDL_Renderer *tempr = SDL_CreateRenderer(temp, -1, 0);
     renderer = tempr;
     SDL_SetRenderDrawColor(renderer, InitialColour.r, InitialColour.g, InitialColour.b, 255);
+    // sets the entire window to white
     SDL_RenderClear(renderer);
 }
 Window::~Window()
@@ -43,14 +46,14 @@ SDL_Renderer *Window::getRenderer()
 }
 void Window::Activate()
 {
+    // code based on "Eike Anderson" ref:2
     bool finished = 0;
     int i;
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderClear(renderer);
+    // the main event loop
     while (!finished)
     {
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderClear(renderer);
         SDL_Event event;
         while (SDL_PollEvent(&event))
         {
@@ -65,20 +68,17 @@ void Window::Activate()
     }
 }
 
-StarterWindow::StarterWindow(char *WindowName)
-{
-    CreateWindow(WindowName, location(500, 600), size(200, 200), colour(white), SDL_WINDOW_RESIZABLE);
-}
-
 CanvasWindow::CanvasWindow(char *WindowName, int ButtonSize, size WindowSize, char *outFileLocation)
 {
+    // Creates a window and creates an image to output to
     outputImage = new Image(outFileLocation);
     CreateWindow(WindowName, location(20, 20), WindowSize, colour(white), 0);
     log("Window Created");
     fflush(stdout);
-    ColourArea = new ResizableArea(location(0), size(WindowSize.width, 120), colour(40), colour(white), 4, SizeLock::height, window);
+    // initialises the various elements of the window
+    ColourArea = new Area(location(0), size(WindowSize.width, 120), colour(40), colour(white), window);
     log("Colour area created");
-    CanvasArea = new ResizableArea(location(0, 120), size(WindowSize.width, WindowSize.height - ((*ColourArea).getSize().height * 2)), colour(128), colour(white), 0, SizeLock::none, window);
+    CanvasArea = new Area(location(0, 120), size(WindowSize.width, WindowSize.height - ((*ColourArea).getSize().height * 2)), colour(128), colour(white), window);
     log("Canvas area created");
     size Temp = size(0, 0);
     CanvasItem = new Canvas(CanvasArea);
@@ -105,6 +105,7 @@ CanvasWindow::CanvasWindow(char *WindowName, int ButtonSize, size WindowSize, ch
 
 CanvasWindow::CanvasWindow(char *WindowName, int ButtonSize, size WindowSize, char *inFileLocation, char *outFileLocation)
 {
+    // Creates a window and creates an image to output to
     inputImage = new Image(inFileLocation);
     ImageExists = true;
     if (WindowSize.width == 0 && WindowSize.height == 0)
@@ -113,9 +114,9 @@ CanvasWindow::CanvasWindow(char *WindowName, int ButtonSize, size WindowSize, ch
     }
     CreateWindow(WindowName, location(20, 20), WindowSize, colour(white), 0);
     outputImage = new Image(outFileLocation);
-    fflush(stdout);
-    ColourArea = new ResizableArea(location(0), size(WindowSize.width, 120), colour(40), colour(white), 4, SizeLock::height, window);
-    CanvasArea = new ResizableArea(location(0, 120), size(WindowSize.width, WindowSize.height - ((*ColourArea).getSize().height * 2)), colour(128), colour(white), 0, SizeLock::none, window);
+    // initialises the various elements of the window
+    ColourArea = new Area(location(0), size(WindowSize.width, 120), colour(40), colour(white), window);
+    CanvasArea = new Area(location(0, 120), size(WindowSize.width, WindowSize.height - ((*ColourArea).getSize().height * 2)), colour(128), colour(white), window);
     size Temp = size(0, 0);
     CanvasItem = new Canvas(CanvasArea);
     CanvasArea->addChild(CanvasItem);
@@ -138,8 +139,8 @@ CanvasWindow::CanvasWindow(char *WindowName, int ButtonSize, size WindowSize, ch
 
 void CanvasWindow::Draw()
 {
-    ColourArea->Draw(renderer, window);
-    CanvasArea->Draw(renderer, window);
+    ColourArea->Draw(renderer);
+    CanvasArea->Draw(renderer);
     for (int i = 0; i < sizeof(ColourButtons) / sizeof(ColourButton); i++)
     {
         ColourButtons[i].Draw(renderer);
@@ -162,12 +163,18 @@ void CanvasWindow::Draw()
 
 void CanvasWindow::Activate()
 {
-    int i = 0;
+    // based on code from "Eike Anderson" ref:2
+
+    // stores whether the loop is still active
     bool finished = 0;
+    // stores whether the user is currently drawing
     bool drawing = 0;
+    // stores whether the user is currently holding the ctrl keys
     bool ctrl = false;
-    Square squareBrush;
+    // stores the shape brushes
+    Rectangle squareBrush;
     Circle circleBrush;
+    // stores a temporary version of the canvas
     Image tempImage;
 
     Draw();
@@ -188,6 +195,7 @@ void CanvasWindow::Activate()
             case SDL_KEYDOWN:
                 if (event.key.keysym.sym == SDLK_s && ctrl)
                 {
+                    //saves the image to the set output file
                     if (ImageExists)
                     {
                         outputImage->SaveImage(renderer, *(CanvasItem->getRect()));
@@ -206,8 +214,10 @@ void CanvasWindow::Activate()
                 break;
             case SDL_MOUSEBUTTONDOWN:
             {
+                //checks if the mouse is in the button colour area
                 if (event.button.y < ColourArea->getPosition().y + ColourArea->getSize().height)
                 {
+                    //checks if the mouse is in the button area when clicked
                     for (int i = 0; i < sizeof(ColourButtons) / sizeof(ColourButton); i++)
                     {
                         if (event.button.x >= ColourButtons[i].getPosition().x &&
@@ -245,23 +255,27 @@ void CanvasWindow::Activate()
                         }
                     }
                 }
+                //checks if the mouse is in the canvas area when clicked
                 else if (event.button.x >= CanvasItem->getPosition().x &&
                          event.button.x <= CanvasItem->getPosition().x + CanvasItem->getSize().width &&
                          event.button.y >= CanvasItem->getPosition().y &&
                          event.button.y <= CanvasItem->getPosition().y + CanvasItem->getSize().height)
                 {
                     drawing = 1;
+                    //runs the fill tool if the fill tool is the current tool
                     if (*(CanvasItem->getBrushType()) == Fill)
                     {
                         CanvasItem->Fill(renderer, window, location(event.button.x, event.button.y));
                         SDL_RenderPresent(renderer);
                     }
+                    //creates a square brush if the brush tool is the current tool
                     else if (*(CanvasItem->getBrushType()) == SquareShape)
                     {
                         tempImage = *new Image("./tempSurface.png");
                         tempImage.SaveImage(renderer, *CanvasItem->getRect());
-                        squareBrush = *new Square(location(event.button.x, event.button.y), size(0, 0), *(CanvasItem->getCurrentColour()), *(CanvasItem->getBrushSize()));
+                        squareBrush = *new Rectangle(location(event.button.x, event.button.y), size(0, 0), *(CanvasItem->getCurrentColour()), *(CanvasItem->getBrushSize()));
                     }
+                    //creates a circle brush if the brush tool is the current tool
                     else if (*CanvasItem->getBrushType() == CircleShape)
                     {
                         tempImage = *new Image("./tempSurface.png");
@@ -271,21 +285,21 @@ void CanvasWindow::Activate()
                 }
             }
             break;
-
             case SDL_MOUSEBUTTONUP:
             {
+                //draws a true rectangle
                 if (*(CanvasItem->getBrushType()) == SquareShape && drawing)
                 {
                     tempImage.DrawImage(renderer, *CanvasItem->getRect());
                     squareBrush.Draw(renderer);
                 }
+                //draws a true circle
                 else if (*(CanvasItem->getBrushType()) == CircleShape && drawing)
                 {
                     tempImage.DrawImage(renderer, *CanvasItem->getRect());
                     circleBrush.Draw(renderer, *CanvasItem->getRect());
                     location Center = circleBrush.getCenter();
                     int radius = circleBrush.getRadius();
-                    CanvasItem->Fill(renderer, window, location(Center.x + radius, Center.y));
                 }
                 drawing = 0;
             }
@@ -293,13 +307,16 @@ void CanvasWindow::Activate()
 
             case SDL_MOUSEMOTION:
             {
+                //draws onto the canas if the mouse is in the area of the canvas
                 if (drawing && *(CanvasItem->getBrushType()) == Basic)
                 {
                     if (event.button.y >= (*CanvasItem).getPosition().y && event.button.y <= (*CanvasItem).getPosition().y + (*CanvasItem).getSize().height && event.button.x >= (*CanvasItem).getPosition().x && event.button.x <= (*CanvasItem).getPosition().x + (*CanvasItem).getSize().width)
                     {
+                        //uses the mouse location with the movement it has made since the last motion event
                         CanvasItem->BrushDraw(renderer, location(event.button.x - event.motion.xrel - 1, event.button.y - event.motion.yrel), location(event.button.x - 1, event.button.y));
                     }
                 }
+                //draws a rectanlge onto the canvas if the mouse is in the area where the bottom right corner is on the mouse
                 else if (drawing && *(CanvasItem->getBrushType()) == SquareShape)
                 {
                     if (event.button.y >= (*CanvasItem).getPosition().y && event.button.y <= (*CanvasItem).getPosition().y + (*CanvasItem).getSize().height && event.button.x >= (*CanvasItem).getPosition().x && event.button.x <= (*CanvasItem).getPosition().x + (*CanvasItem).getSize().width)
@@ -308,6 +325,7 @@ void CanvasWindow::Activate()
                         squareBrush.DrawTemp(renderer, location(event.button.x, event.button.y));
                     }
                 }
+                //draws a circle onto the canvas if the mouse is in the area
                 else if (drawing && *(CanvasItem->getBrushType()) == CircleShape)
                 {
                     if (event.button.y >= (*CanvasItem).getPosition().y && event.button.y <= (*CanvasItem).getPosition().y + (*CanvasItem).getSize().height && event.button.x >= (*CanvasItem).getPosition().x && event.button.x <= (*CanvasItem).getPosition().x + (*CanvasItem).getSize().width)
@@ -322,4 +340,5 @@ void CanvasWindow::Activate()
             }
         }
     }
+    // based on code from "Eike Anderson" finished
 }

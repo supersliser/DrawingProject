@@ -6,8 +6,10 @@ char *Image::getFilename()
 {
     for (int i = sizeof(fullPath) / sizeof(char); i > 0; i--)
     {
+        // Searches from the end of the path until the "/"
         if (fullPath[i] == *"/")
         {
+            // Returns data on the right of the "/"
             char *filename = (char *)malloc((sizeof(fullPath) / sizeof(char)) - i);
             for (int j = i; j < sizeof(fullPath) / sizeof(char); j++)
             {
@@ -23,8 +25,10 @@ char *Image::getFileLocation()
 {
     for (int i = sizeof(fullPath) / sizeof(char); i > 0; i--)
     {
+        // Searches from the end of the path until the "/"
         if (fullPath[i] == *"/")
         {
+            // Returns data on the left of the "/"
             char *path = (char *)malloc((sizeof(fullPath) / sizeof(char)) - i);
             for (int j = 0; j < i; j++)
             {
@@ -37,6 +41,7 @@ char *Image::getFileLocation()
 }
 Image::Image(char *inFileLocation)
 {
+    // checks the extension
     if (inFileLocation[strlen(inFileLocation) - 3] == *"w" && inFileLocation[strlen(inFileLocation) - 3] == *"e" && inFileLocation[strlen(inFileLocation) - 2] == *"b" && inFileLocation[strlen(inFileLocation) - 1] == *"p")
     {
         ext = WEBP;
@@ -66,6 +71,7 @@ Image::Image()
 
 void Image::SaveImage(SDL_Renderer *renderer, SDL_Rect Canvas)
 {
+    // code based on "Eike Anderson" ref:3
     SDL_Surface *sectionSurface = SDL_CreateRGBSurface(0, Canvas.w, Canvas.h, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
 
     if (SDL_RenderReadPixels(renderer, &Canvas, SDL_PIXELFORMAT_RGBA8888, sectionSurface->pixels, sectionSurface->pitch) != 0)
@@ -94,6 +100,7 @@ void Image::SaveImage(SDL_Renderer *renderer, SDL_Rect Canvas)
         }
     }
     }
+    // end of code based on "Eike Anderson"
 }
 
 SDL_Surface *Image::getSurface()

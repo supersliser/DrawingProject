@@ -44,28 +44,31 @@ void Area::setBorderColour(colour in)
 {
 	BorderColour = in;
 }
-//    void setBorderWidth(int in)
-//    {
-//        borderWidth = in;
-//    }
 void Area::setParent(Area *inParent)
 {
 	parent = inParent;
 }
 void Area::addChild(Area *inArea)
 {
+	// if there are no children, the area must first be defined, then it can be redefined after
 	if (childCount == 0)
 	{
 		children = (Area **)malloc(sizeof(Area *));
 	}
+	else
+	{
+		children = (Area **)realloc(children, sizeof(Area *) * childCount + 1);
+	}
 	childCount++;
-	children = (Area **)realloc(children, sizeof(Area *) * childCount);
+	// assigns the actual pointer
 	children[childCount - 1] = inArea;
 	(*inArea).setParent(this);
 }
 void Area::killChild(int index)
 {
+	// Releases the memory to the heap
 	free(children[index]);
+	// Moves all other children after this child down by 1
 	for (int i = index; i < childCount - 1; i++)
 	{
 		children[i] = children[i + 1];
@@ -80,6 +83,7 @@ Area *Area::getChild(int index)
 location Area::getPosition()
 {
 	location temp;
+	// if it has a parent then the position should be absolute as a pose to relative to the parent
 	if (parent == nullptr)
 	{
 		temp.x = Position.x;
@@ -106,31 +110,16 @@ colour Area::getBorderColour()
 {
 	return BorderColour;
 }
-//    int getBorderWidth()
-//    {
-//        return borderWidth;
-//    }
 void Area::Draw(SDL_Renderer *renderer)
 {
-	SDL_Rect temp;
-	if (parent == nullptr)
-	{
-		temp.x = Position.x;
-		temp.y = Position.y;
-	}
-	else
-	{
-		temp.x = Position.x + (*parent).getPosition().x;
-		;
-		temp.y = Position.y + (*parent).getPosition().y;
-		;
-	}
-	temp.w = Size.width;
-	temp.h = Size.height;
+	SDL_Rect temp = *getRect();
 	SDL_SetRenderDrawColor(renderer, BackColour.r, BackColour.g, BackColour.b, 255);
+	// Draws the background
 	SDL_RenderFillRect(renderer, &temp);
 	SDL_SetRenderDrawColor(renderer, BorderColour.r, BorderColour.g, BorderColour.b, 255);
+	// Draws the border colour
 	SDL_RenderDrawRect(renderer, &temp);
+	// Draws all children if any
 	for (int i = 0; i < childCount; i++)
 	{
 		(*children[i]).Draw(renderer);
@@ -145,83 +134,6 @@ SDL_Rect *Area::getRect()
 	output.w = getSize().width;
 	output.h = getSize().height;
 	return &output;
-}
-
-ResizableArea::ResizableArea(location inPosition, size inSize, colour inBC, colour inBorderC, int inBW, SizeLock inLock, SDL_Window *window)
-{
-	if (parent == nullptr)
-	{
-		Position = inPosition;
-	}
-	else
-	{
-		Position.x = (*parent).getSize().width - Position.x;
-		Position.y = (*parent).getSize().height - Position.y;
-	}
-	Size = inSize;
-	BackColour = inBC;
-	BorderColour = inBorderC;
-	lock = inLock;
-	size Temp = size(0, 0);
-	SDL_GetWindowSize(window, &Temp.width, &Temp.height);
-	fflush(stdout);
-	Margin.top = Position.y;
-	Margin.left = Position.x;
-	Margin.bottom = Temp.height - (Margin.top + Size.height);
-	Margin.right = Temp.width - (Margin.left + Size.width);
-}
-ResizableArea::ResizableArea(location inPosition, size inSize, colour inBC, colour inBorderC, int inBW, SizeLock inLock, Area *Parent, SDL_Window *window)
-{
-	parent = Parent;
-	if (parent == nullptr)
-	{
-		Position = inPosition;
-	}
-	else
-	{
-		Position.x = (*parent).getSize().width - Position.x;
-		Position.y = (*parent).getSize().height - Position.y;
-	}
-	Size = inSize;
-	BackColour = inBC;
-	BorderColour = inBorderC;
-	lock = inLock;
-
-	log("properties assigned");
-	size Temp = size(0, 0);
-	SDL_GetWindowSize(window, &Temp.width, &Temp.height);
-	printf("window size is x= %d, y= %d\n", Temp.width, Temp.height);
-	fflush(stdout);
-	Margin.top = Position.y;
-	Margin.left = Position.x;
-	Margin.bottom = Temp.height - (Margin.top + Size.height);
-	Margin.right = Temp.width - (Margin.left + Size.width);
-}
-void ResizableArea::Draw(SDL_Renderer *renderer, SDL_Window *window)
-{
-	size temp;
-	if (parent == nullptr)
-	{
-		SDL_GetWindowSize(window, &(temp.width), &(temp.height));
-	}
-	else
-	{
-		temp = (*parent).getSize();
-	}
-	switch (lock)
-	{
-	case SizeLock::none:
-		Size.width = temp.width - Margin.right;
-		Size.height = temp.height - Margin.bottom;
-		break;
-	case SizeLock::width:
-		Size.height = temp.height - Margin.bottom;
-		break;
-	case SizeLock::height:
-		Size.width = temp.width - Margin.right;
-		break;
-	}
-	Area::Draw(renderer);
 }
 
 Canvas::Canvas(Area *inParent)
@@ -240,6 +152,7 @@ colour *Canvas::getCurrentColour()
 	return &BrushItem.CurrentColour;
 }
 
+// source based on "Eike Anderson" ref:1
 colour Canvas::getPixelColour(SDL_Renderer *renderer, int x, int y)
 {
 	colour pcol;
@@ -268,12 +181,6 @@ colour Canvas::getPixelColour(SDL_Renderer *renderer, int x, int y)
 	return pcol;
 }
 
-void Canvas::Fill(SDL_Renderer *renderer, SDL_Window *window, location mouseLocation)
-{
-	SDL_SetRenderDrawColor(renderer, BrushItem.CurrentColour.r, BrushItem.CurrentColour.g, BrushItem.CurrentColour.b, 255);
-	Fillr(renderer, mouseLocation, getPixelColour(renderer, mouseLocation.x, mouseLocation.y));
-}
-
 void Canvas::Fillr(SDL_Renderer *renderer, location PointLocation, colour sourceColour)
 {
 	colour pcol = getPixelColour(renderer, PointLocation.x, PointLocation.y);
@@ -295,6 +202,7 @@ void Canvas::Fillr(SDL_Renderer *renderer, location PointLocation, colour source
 	Fillr(renderer, location(PointLocation.x + 1, PointLocation.y), sourceColour);
 	Fillr(renderer, location(PointLocation.x, PointLocation.y + 1), sourceColour);
 }
+// source based on "Eike Anderson" ends here
 
 void Canvas::BrushDraw(SDL_Renderer *renderer, location lOne, location lTwo)
 {

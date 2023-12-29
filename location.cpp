@@ -35,25 +35,3 @@ size::size(int inWidth, int inHeight)
 	width = inWidth;
 	height = inHeight;
 }
-
-margin::margin()
-{
-	top = 0;
-	bottom = 0;
-	left = 0;
-	right = 0;
-}
-margin::margin(int inT, int inB, int inL, int inR)
-{
-	top = inT;
-	bottom = inB;
-	left = inL;
-	right = inR;
-}
-margin::margin(location inLoc)
-{
-	top = inLoc.y;
-	left = inLoc.x;
-	bottom = inLoc.y;
-	right = inLoc.x;
-}
