@@ -81,12 +81,6 @@ colour::colour(Uint8 in)
     g = in;
     b = in;
 }
-colour::colour(Uint8 in, Uint8 inA)
-{
-    r = in;
-    g = in;
-    b = in;
-}
 colour::colour(Uint8 rIn, Uint8 gIn, Uint8 bIn)
 {
     r = rIn;
