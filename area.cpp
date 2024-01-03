@@ -181,6 +181,12 @@ colour Canvas::getPixelColour(SDL_Renderer *renderer, int x, int y)
 	return pcol;
 }
 
+void Canvas::Fill(SDL_Renderer *renderer, SDL_Window *window, location mouseLocation)
+{
+	SDL_SetRenderDrawColor(renderer, BrushItem.CurrentColour.r, BrushItem.CurrentColour.g, BrushItem.CurrentColour.b, 255);
+	Fillr(renderer, mouseLocation, getPixelColour(renderer, mouseLocation.x, mouseLocation.y));
+}
+
 void Canvas::Fillr(SDL_Renderer *renderer, location PointLocation, colour sourceColour)
 {
 	colour pcol = getPixelColour(renderer, PointLocation.x, PointLocation.y);
